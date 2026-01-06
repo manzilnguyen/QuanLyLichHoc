@@ -1,0 +1,41 @@
+﻿@model QuanLyLichHoc.Models.SystemNotification
+@{
+    ViewData["Title"] = "Soạn thông báo";
+}
+
+<div class="container py-4">
+    <div class="card shadow border-0 mx-auto" style="max-width: 700px;">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-megaphone-fill me-2"></i> Gửi thông báo toàn trường</h5>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="Create">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Tiêu đề</label>
+                    <input asp-for="Title" class="form-control" placeholder="VD: Thông báo nghỉ lễ..." required />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Loại tin</label>
+                    <select asp-for="Type" class="form-select">
+                        <option value="Info">🔵 Thông tin thường</option>
+                        <option value="Warning">🟡 Lưu ý quan trọng</option>
+                        <option value="Danger">🔴 Khẩn cấp</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Nội dung chi tiết</label>
+                    <textarea asp-for="Content" class="form-control" rows="5" placeholder="Nhập nội dung thông báo..." required></textarea>
+                    <span asp-validation-for="Content" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a asp-action="Index" class="btn btn-light border">Hủy</a>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-send-fill me-1"></i> Gửi ngay</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

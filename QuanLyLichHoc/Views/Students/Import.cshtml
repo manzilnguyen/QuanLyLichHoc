@@ -1,0 +1,40 @@
+﻿@{
+    ViewData["Title"] = "Import Học sinh";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow border-0 rounded-4">
+                <div class="card-header bg-success text-white py-3 rounded-top-4">
+                    <h5 class="mb-0 fw-bold text-center"><i class="bi bi-file-earmark-excel-fill me-2"></i>Import Học Sinh</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-info bg-info bg-opacity-10 text-info border-0 shadow-sm">
+                        <h6 class="fw-bold mb-2"><i class="bi bi-info-circle me-2"></i>Cấu trúc file Excel (.xlsx):</h6>
+                        <ul class="mb-0 small ps-3">
+                            <li><strong>Cột A:</strong> Mã SV (Bắt buộc)</li>
+                            <li><strong>Cột B:</strong> Họ và Tên</li>
+                            <li><strong>Cột C:</strong> Ngày sinh (dd/MM/yyyy)</li>
+                            <li><strong>Cột D:</strong> Tên Lớp (Hệ thống tự tạo lớp nếu chưa có)</li>
+                            <li><strong>Cột E:</strong> Số điện thoại</li>
+                        </ul>
+                    </div>
+
+                    <form asp-action="Import" method="post" enctype="multipart/form-data" class="mt-4">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-secondary">Chọn file từ máy tính:</label>
+                            <input type="file" name="file" class="form-control form-control-lg" accept=".xlsx" required />
+                        </div>
+                        <div class="d-grid gap-2 d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-light rounded-pill px-4">Quay lại</a>
+                            <button type="submit" class="btn btn-success rounded-pill px-4 shadow-sm fw-bold">
+                                <i class="bi bi-upload me-1"></i> Tải lên
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

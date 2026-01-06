@@ -1,0 +1,41 @@
+﻿@{
+    ViewData["Title"] = "Import Giảng viên";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow border-0 rounded-4">
+                <div class="card-header bg-success text-white py-3 rounded-top-4">
+                    <h5 class="mb-0 fw-bold text-center"><i class="bi bi-file-earmark-excel-fill me-2"></i>Import Dữ Liệu Excel</h5>
+                </div>
+                <div class="card-body p-4">
+
+                    <div class="alert alert-info border-0 bg-info bg-opacity-10 text-info shadow-sm">
+                        <h6 class="fw-bold mb-2"><i class="bi bi-info-circle me-2"></i>Quy định file Excel (.xlsx):</h6>
+                        <ul class="mb-0 small ps-3">
+                            <li><strong>Cột A:</strong> Họ và Tên giảng viên</li>
+                            <li><strong>Cột B:</strong> Email (Bắt buộc, Duy nhất)</li>
+                            <li><strong>Cột C:</strong> Số điện thoại</li>
+                            <li><strong>Cột D:</strong> Khoa / Bộ môn</li>
+                        </ul>
+                    </div>
+
+                    <form asp-action="Import" method="post" enctype="multipart/form-data" class="mt-4">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-secondary">Chọn file từ máy tính:</label>
+                            <input type="file" name="file" class="form-control form-control-lg" accept=".xlsx" required />
+                        </div>
+
+                        <div class="d-grid gap-2 d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-light rounded-pill px-4">Quay lại</a>
+                            <button type="submit" class="btn btn-success rounded-pill px-4 shadow-sm fw-bold">
+                                <i class="bi bi-upload me-1"></i> Tiến hành Upload
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

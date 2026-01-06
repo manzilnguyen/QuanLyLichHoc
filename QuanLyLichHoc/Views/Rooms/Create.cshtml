@@ -1,0 +1,56 @@
+﻿@using QuanLyLichHoc.Models
+@model Room
+@{
+    ViewData["Title"] = "Thêm Phòng học";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-primary text-white text-center py-3 rounded-top-4">
+                    <h5 class="mb-0 fw-bold">THÊM PHÒNG MỚI</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="RoomName" class="form-control" placeholder="Tên phòng" />
+                            <label asp-for="RoomName"><i class="bi bi-tag me-1"></i>Tên phòng (VD: A101)</label>
+                            <span asp-validation-for="RoomName" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Capacity" class="form-control" type="number" placeholder="Sức chứa" />
+                            <label asp-for="Capacity"><i class="bi bi-people me-1"></i>Sức chứa (người)</label>
+                            <span asp-validation-for="Capacity" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-floating mb-4">
+                            <select asp-for="Type" class="form-select" asp-items="Html.GetEnumSelectList<RoomType>()">
+                                <option value="">-- Chọn loại phòng --</option>
+                            </select>
+                            <label asp-for="Type"><i class="bi bi-layers me-1"></i>Loại phòng</label>
+                            <span asp-validation-for="Type" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-light"><i class="bi bi-arrow-left"></i> Quay lại</a>
+                            <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm">
+                                <i class="bi bi-save me-1"></i> Lưu lại
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}

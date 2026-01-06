@@ -1,0 +1,44 @@
+﻿@model QuanLyLichHoc.Models.Subject
+@{
+    ViewData["Title"] = "Xóa Môn học";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger shadow border-0 rounded-4">
+                <div class="card-header bg-danger text-white text-center py-3 rounded-top-4">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i>Xác nhận Xóa</h5>
+                </div>
+                <div class="card-body p-4 text-center">
+                    <h5 class="card-title text-danger mb-4">Bạn có chắc chắn muốn xóa môn học này?</h5>
+
+                    <div class="p-3 bg-light rounded-3 mb-4 text-start">
+                        <div class="row mb-2">
+                            <div class="col-4 fw-bold text-secondary">Mã môn:</div>
+                            <div class="col-8">@Model.SubjectCode</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4 fw-bold text-secondary">Tên môn:</div>
+                            <div class="col-8 fw-bold text-primary">@Model.SubjectName</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4 fw-bold text-secondary">Số tín chỉ:</div>
+                            <div class="col-8">@Model.Credits</div>
+                        </div>
+                    </div>
+
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-flex justify-content-center gap-3">
+                            <a asp-action="Index" class="btn btn-secondary px-4 rounded-pill">Không, quay lại</a>
+                            <button type="submit" class="btn btn-danger px-4 rounded-pill shadow-sm">
+                                <i class="bi bi-trash-fill me-1"></i> Xóa ngay
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

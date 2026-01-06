@@ -1,0 +1,54 @@
+﻿@model QuanLyLichHoc.Models.Subject
+@{
+    ViewData["Title"] = "Sửa Môn học";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-warning bg-opacity-75 text-white text-center py-3 rounded-top-4">
+                    <h5 class="mb-0 fw-bold text-uppercase text-dark">Cập nhật Môn Học</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3 border-0"></div>
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="SubjectCode" class="form-control bg-light" readonly placeholder="Mã môn" />
+                            <label asp-for="SubjectCode">Mã môn học (Không thể sửa)</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="SubjectName" class="form-control" placeholder="Nhập tên môn" />
+                            <label asp-for="SubjectName">Tên môn học</label>
+                            <span asp-validation-for="SubjectName" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-floating mb-4">
+                            <input asp-for="Credits" class="form-control" type="number" placeholder="Số tín chỉ" />
+                            <label asp-for="Credits">Số tín chỉ</label>
+                            <span asp-validation-for="Credits" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill">
+                                <i class="bi bi-arrow-left"></i> Hủy
+                            </a>
+                            <button type="submit" class="btn btn-warning px-4 py-2 fw-bold shadow-sm rounded-pill">
+                                <i class="bi bi-check-circle me-1"></i> Lưu thay đổi
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

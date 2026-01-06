@@ -1,0 +1,81 @@
+﻿@model QuanLyLichHoc.Models.Student
+@{
+    ViewData["Title"] = "Thêm Học sinh";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-primary text-white text-center py-3 rounded-top-4">
+                    <h5 class="mb-0 fw-bold text-uppercase">Thêm Học Sinh Mới</h5>
+                </div>
+                <div class="card-body p-4 bg-light bg-opacity-10">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="text-primary fw-bold mb-3"><i class="bi bi-person-vcard me-2"></i>Thông tin cơ bản</h6>
+
+                                <div class="form-floating mb-3">
+                                    <input asp-for="StudentCode" class="form-control" placeholder="Mã SV" />
+                                    <label asp-for="StudentCode">Mã Sinh Viên (Tài khoản)</label>
+                                    <span asp-validation-for="StudentCode" class="text-danger small"></span>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    <input asp-for="FullName" class="form-control" placeholder="Họ tên" />
+                                    <label asp-for="FullName">Họ và Tên</label>
+                                    <span asp-validation-for="FullName" class="text-danger small"></span>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    <input asp-for="DateOfBirth" class="form-control" type="date" />
+                                    <label asp-for="DateOfBirth">Ngày sinh</label>
+                                    <span asp-validation-for="DateOfBirth" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <h6 class="text-primary fw-bold mb-3"><i class="bi bi-building me-2"></i>Thông tin Lớp & Liên hệ</h6>
+
+                                <div class="form-floating mb-3">
+                                    <select asp-for="ClassId" class="form-select" asp-items="ViewBag.ClassId"></select>
+                                    <label asp-for="ClassId">Lớp sinh hoạt</label>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    <input asp-for="PhoneNumber" class="form-control" placeholder="SĐT" />
+                                    <label asp-for="PhoneNumber">Số điện thoại</label>
+                                    <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                                </div>
+
+                                <div class="alert alert-info small mt-4">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Hệ thống sẽ tự động tạo tài khoản đăng nhập với:<br>
+                                    - <strong>Username:</strong> Mã sinh viên<br>
+                                    - <strong>Password:</strong> 123456
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-4 border-top pt-3">
+                            <a asp-action="Index" class="btn btn-light rounded-pill px-4">Quay lại</a>
+                            <button type="submit" class="btn btn-primary px-5 py-2 fw-bold shadow-sm rounded-pill">
+                                <i class="bi bi-save me-1"></i> Lưu hồ sơ
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}

@@ -1,0 +1,142 @@
+﻿@model QuanLyLichHoc.Models.Schedule
+@{
+    ViewData["Title"] = "Xếp lịch thông minh";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-primary text-white text-center py-3 rounded-top-4">
+                    <h5 class="mb-0 fw-bold text-uppercase"><i class="bi bi-magic me-2"></i>Xếp Lịch Thủ Công Thông Minh</h5>
+                </div>
+                <div class="card-body p-4 bg-light bg-opacity-10">
+
+                    <div class="alert alert-info shadow-sm">
+                        <i class="bi bi-lightbulb-fill me-2 text-warning"></i>
+                        <strong>Mẹo:</strong> Hãy chọn <strong>Thời gian</strong> trước. Hệ thống sẽ tự động gợi ý <strong>Phòng trống</strong> và <strong>Giảng viên rảnh</strong> cho bạn.
+                    </div>
+
+                    <form asp-action="Create">
+                        <div asp-validation-summary="All" class="text-danger mb-3 small"></div>
+
+                        <div class="card mb-3 border-primary border-opacity-25">
+                            <div class="card-body">
+                                <h6 class="text-primary fw-bold"><i class="bi bi-clock me-2"></i>Bước 1: Chọn Thời Gian</h6>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label asp-for="DayOfWeek" class="form-label small fw-bold">Thứ</label>
+                                        <select asp-for="DayOfWeek" class="form-select" id="DayOfWeek" asp-items="Html.GetEnumSelectList<DayOfWeek>()"></select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label asp-for="StartTime" class="form-label small fw-bold">Bắt đầu</label>
+                                        <input asp-for="StartTime" type="time" class="form-control" id="StartTime" value="07:00" />
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label asp-for="EndTime" class="form-label small fw-bold">Kết thúc</label>
+                                        <input asp-for="EndTime" type="time" class="form-control" id="EndTime" value="09:00" />
+                                    </div>
+                                </div>
+                                <div class="text-end mt-2">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" id="btnCheckSuggestion">
+                                        <i class="bi bi-arrow-repeat"></i> Tìm Phòng & GV Trống
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ClassId" class="form-label fw-bold">Lớp học</label>
+                                <select asp-for="ClassId" class="form-select select2" asp-items="ViewBag.ClassId"></select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="SubjectId" class="form-label fw-bold">Môn học</label>
+                                <select asp-for="SubjectId" class="form-select select2" asp-items="ViewBag.SubjectId"></select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="RoomId" class="form-label fw-bold">Phòng học (Gợi ý)</label>
+                                <select asp-for="RoomId" class="form-select select2" id="RoomSelect" asp-items="ViewBag.RoomId">
+                                    <option value="" disabled selected>-- Vui lòng chọn giờ trước --</option>
+                                </select>
+                                <small class="text-success d-none" id="roomHint"><i class="bi bi-check-all"></i> Đã lọc phòng trống</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LecturerId" class="form-label fw-bold">Giảng viên (Gợi ý)</label>
+                                <select asp-for="LecturerId" class="form-select select2" id="LecturerSelect" asp-items="ViewBag.LecturerId">
+                                    <option value="" disabled selected>-- Vui lòng chọn giờ trước --</option>
+                                </select>
+                                <small class="text-success d-none" id="lecHint"><i class="bi bi-check-all"></i> Đã lọc GV rảnh</small>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-4 border-top pt-3">
+                            <a asp-action="Index" class="btn btn-light rounded-pill px-4">Quay lại</a>
+                            <button type="submit" class="btn btn-primary px-5 py-2 fw-bold shadow-sm rounded-pill">
+                                <i class="bi bi-save me-1"></i> Lưu Lịch
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Khởi tạo Select2 cho đẹp
+            $('.select2').select2({ theme: 'bootstrap-5', width: '100%' });
+
+            // Hàm gọi API gợi ý
+            function fetchSuggestions() {
+                var day = $('#DayOfWeek').val();
+                var start = $('#StartTime').val();
+                var end = $('#EndTime').val();
+
+                if(start && end) {
+                    // Hiệu ứng Loading
+                    $('#RoomSelect, #LecturerSelect').prop('disabled', true);
+
+                    $.ajax({
+                        url: '/Schedules/GetSuggestions',
+                        type: 'GET',
+                        data: { day: day, start: start, end: end },
+                        success: function(data) {
+                            // Update Room Select
+                            var roomSelect = $('#RoomSelect');
+                            roomSelect.empty();
+                            $.each(data.rooms, function(i, item) {
+                                roomSelect.append($('<option>', { value: item.id, text: item.name }));
+                            });
+
+                            // Update Lecturer Select
+                            var lecSelect = $('#LecturerSelect');
+                            lecSelect.empty();
+                            $.each(data.lecturers, function(i, item) {
+                                lecSelect.append($('<option>', { value: item.id, text: item.name }));
+                            });
+
+                            $('#RoomSelect, #LecturerSelect').prop('disabled', false);
+                            $('#roomHint, #lecHint').removeClass('d-none');
+
+                            // Refresh Select2
+                            $('.select2').trigger('change');
+                        }
+                    });
+                }
+            }
+
+            // Gắn sự kiện khi thay đổi giờ hoặc bấm nút
+            $('#btnCheckSuggestion').click(fetchSuggestions);
+            $('#DayOfWeek, #StartTime, #EndTime').change(fetchSuggestions);
+
+            // Gọi lần đầu
+            fetchSuggestions();
+        });
+    </script>
+}

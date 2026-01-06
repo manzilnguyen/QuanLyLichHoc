@@ -1,0 +1,44 @@
+﻿@model QuanLyLichHoc.Models.Lecturer
+@{
+    ViewData["Title"] = "Xóa Giảng viên";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger shadow border-0 rounded-4">
+                <div class="card-header bg-danger text-white text-center py-3 rounded-top-4">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i>XÁC NHẬN XÓA</h5>
+                </div>
+                <div class="card-body p-4 text-center">
+                    <h5 class="card-title text-danger mb-3">Bạn chắc chắn muốn xóa giảng viên này?</h5>
+
+                    <div class="p-3 bg-light rounded-3 text-start mb-4 shadow-sm">
+                        <div class="d-flex justify-content-between mb-2 border-bottom pb-2">
+                            <span class="text-muted fw-bold">Họ tên:</span>
+                            <span class="fw-bold text-primary">@Model.FullName</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2 border-bottom pb-2">
+                            <span class="text-muted fw-bold">Email:</span>
+                            <span>@Model.Email</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted fw-bold">Khoa:</span>
+                            <span>@Model.Department</span>
+                        </div>
+                    </div>
+
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-flex justify-content-center gap-3">
+                            <a asp-action="Index" class="btn btn-secondary rounded-pill px-4">Hủy bỏ</a>
+                            <button type="submit" class="btn btn-danger rounded-pill px-4 shadow-sm fw-bold">
+                                <i class="bi bi-trash-fill me-1"></i> Xóa ngay
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

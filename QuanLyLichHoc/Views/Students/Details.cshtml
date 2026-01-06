@@ -1,0 +1,80 @@
+﻿@model QuanLyLichHoc.Models.Student
+@{
+    ViewData["Title"] = "Hồ sơ Học sinh";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card shadow border-0 rounded-4 overflow-hidden">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-person-vcard-fill me-2"></i>Hồ sơ chi tiết</h5>
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-4 text-center border-end">
+                            <div class="rounded-circle bg-primary bg-opacity-10 text-primary fw-bold d-inline-flex justify-content-center align-items-center mb-3 shadow-sm"
+                                 style="width: 100px; height: 100px; font-size: 2.5rem;">
+                                @(string.IsNullOrEmpty(Model.FullName) ? "?" : Model.FullName.Substring(0, 1).ToUpper())
+                            </div>
+                            <h5 class="fw-bold text-dark mb-1">@Model.FullName</h5>
+                            <span class="badge bg-secondary rounded-pill">Học sinh</span>
+                        </div>
+
+                        <div class="col-md-8 ps-md-4 mt-3 mt-md-0">
+                            <div class="row mb-3 border-bottom pb-2">
+                                <div class="col-sm-4 fw-bold text-muted small text-uppercase">Mã Sinh Viên</div>
+                                <div class="col-sm-8 fw-bold text-primary">@Model.StudentCode</div>
+                            </div>
+
+                            <div class="row mb-3 border-bottom pb-2">
+                                <div class="col-sm-4 fw-bold text-muted small text-uppercase">Ngày sinh</div>
+                                <div class="col-sm-8">@Model.DateOfBirth.ToString("dd/MM/yyyy")</div>
+                            </div>
+
+                            <div class="row mb-3 border-bottom pb-2">
+                                <div class="col-sm-4 fw-bold text-muted small text-uppercase">Lớp sinh hoạt</div>
+                                <div class="col-sm-8">
+                                    @if (Model.Class != null)
+                                    {
+                                        <span class="badge bg-info bg-opacity-10 text-info border border-info rounded-pill px-3">
+                                            @Model.Class.ClassName
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted fst-italic">-- Chưa phân lớp --</span>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="row mb-1">
+                                <div class="col-sm-4 fw-bold text-muted small text-uppercase">Số điện thoại</div>
+                                <div class="col-sm-8">
+                                    @if (!string.IsNullOrEmpty(Model.PhoneNumber))
+                                    {
+                                        <span>@Model.PhoneNumber</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">Chưa cập nhật</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-light p-3 d-flex justify-content-end gap-2">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning rounded-pill shadow-sm">
+                        <i class="bi bi-pencil-square me-1"></i> Chỉnh sửa
+                    </a>
+                    <a asp-action="Index" class="btn btn-secondary rounded-pill">
+                        <i class="bi bi-arrow-return-left me-1"></i> Quay lại
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

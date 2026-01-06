@@ -1,0 +1,133 @@
+﻿@model IEnumerable<QuanLyLichHoc.Models.Schedule>
+@{
+    ViewData["Title"] = "Thời Khóa Biểu";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h3 class="fw-bold text-primary mb-0"><i class="bi bi-calendar-week me-2"></i>Thời Khóa Biểu</h3>
+            <p class="text-muted small mb-0">Quản lý và theo dõi lịch học toàn trường</p>
+        </div>
+
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="btn-group shadow-sm">
+                <a asp-action="Import" class="btn btn-success fw-bold">
+                    <i class="bi bi-file-earmark-spreadsheet me-1"></i> Import & Xếp Lịch
+                </a>
+                <a asp-action="Create" class="btn btn-primary fw-bold">
+                    <i class="bi bi-plus-lg me-1"></i> Xếp Thủ Công
+                </a>
+            </div>
+        }
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm"><i class="bi bi-check-circle me-2"></i>@TempData["Success"]<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm"><i class="bi bi-exclamation-triangle me-2"></i>@TempData["Error"]<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+    }
+
+    @if (TempData["ErrorDetails"] != null)
+    {
+        <div class="alert alert-warning shadow-sm">
+            <strong>Chi tiết lỗi khi xếp lịch:</strong>
+            <ul class="mb-0 mt-2">
+                @foreach (var err in (IEnumerable<string>)TempData["ErrorDetails"])
+                {
+                    <li>@err</li>
+                }
+            </ul>
+        </div>
+    }
+
+    <div class="card shadow-sm border-0 mb-3 bg-light">
+        <div class="card-body py-3">
+            <form asp-action="Index" method="get" class="row g-2 align-items-end">
+                <div class="col-md-2">
+                    <label class="small fw-bold text-muted">Học kỳ</label>
+                    <select name="semester" class="form-select form-select-sm" asp-items="ViewBag.Semester">
+                        <option value="">-- Tất cả --</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="small fw-bold text-muted">Lớp</label>
+                    <select name="classId" class="form-select form-select-sm" asp-items="ViewBag.ClassId">
+                        <option value="">-- Tất cả --</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="small fw-bold text-muted">Môn học</label>
+                    <select name="subjectId" class="form-select form-select-sm" asp-items="ViewBag.SubjectId">
+                        <option value="">-- Tất cả --</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="small fw-bold text-muted">Giảng viên</label>
+                    <select name="lecturerId" class="form-select form-select-sm" asp-items="ViewBag.LecturerId">
+                        <option value="">-- Tất cả --</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-sm btn-primary w-100"><i class="bi bi-funnel"></i> Lọc</button>
+                    <button type="submit" formaction="@Url.Action("Export")" class="btn btn-sm btn-outline-success w-100">
+                        <i class="bi bi-download"></i> Xuất Excel
+                    </button>
+                    <a asp-action="Index" class="btn btn-sm btn-secondary"><i class="bi bi-arrow-counterclockwise"></i></a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="bg-light text-secondary text-uppercase small fw-bold">
+                        <tr>
+                            <th class="ps-4">Thứ</th>
+                            <th>Thời gian</th>
+                            <th>Lớp</th>
+                            <th>Môn học</th>
+                            <th>Phòng</th>
+                            <th>Giảng viên</th>
+                            <th>Học kỳ</th>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <th class="text-center">Thao tác</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-4"><span class="badge bg-light text-dark border shadow-sm">@item.DayOfWeek</span></td>
+                                <td class="fw-bold text-primary font-monospace">@item.StartTime.ToString(@"hh\:mm") - @item.EndTime.ToString(@"hh\:mm")</td>
+                                <td class="fw-bold">@item.Class.ClassName</td>
+                                <td>@item.Subject.SubjectName</td>
+                                <td><span class="badge bg-info bg-opacity-10 text-info border border-info rounded-pill px-3">@item.Room.RoomName</span></td>
+                                <td><i class="bi bi-person-badge me-1 text-muted"></i>@item.Lecturer.FullName</td>
+                                <td><small class="text-muted">@item.Semester</small></td>
+
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <td class="text-center">
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-light text-warning border-0"><i class="bi bi-pencil-square"></i></a>
+                                        <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('Xóa lịch?');">
+                                            <button type="submit" class="btn btn-sm btn-light text-danger border-0"><i class="bi bi-trash"></i></button>
+                                        </form>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

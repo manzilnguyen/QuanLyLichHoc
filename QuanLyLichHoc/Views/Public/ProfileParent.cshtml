@@ -1,0 +1,85 @@
+﻿@model QuanLyLichHoc.Models.Student
+@{
+    ViewData["Title"] = "Hồ sơ Phụ huynh";
+}
+
+<div class="profile-header" style="height: 200px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 0 0 50% 50%; margin-bottom: -100px;"></div>
+
+<div class="container pb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                <div class="card-body p-0">
+                    <div class="row g-0">
+
+                        <div class="col-md-4 bg-light text-center p-5 border-end">
+                            <div class="position-relative d-inline-block mb-3">
+                                <img src="@(Model.Avatar ?? "https://via.placeholder.com/150")"
+                                     class="rounded-circle shadow-lg border border-4 border-white"
+                                     style="width: 140px; height: 140px; object-fit: cover;">
+                            </div>
+                            <h4 class="fw-bold text-dark mb-1">@Model.FullName</h4>
+                            <span class="badge bg-warning text-dark border border-warning px-3 py-1 rounded-pill mb-4">
+                                Con: @Model.StudentCode
+                            </span>
+
+                            <div class="d-grid gap-2">
+                                <a asp-action="EditProfile" class="btn btn-outline-danger rounded-pill fw-bold">
+                                    <i class="bi bi-pencil-square me-2"></i>Cập nhật thông tin
+                                </a>
+                                <a asp-action="MySchedule" class="btn btn-danger rounded-pill fw-bold">
+                                    <i class="bi bi-calendar-week me-2"></i>Xem Lịch của Con
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="col-md-8 p-5">
+                            <h5 class="fw-bold text-uppercase text-danger mb-4 small ls-1 border-bottom border-danger pb-2">
+                                <i class="bi bi-person-bounding-box me-2"></i>Thông tin Phụ huynh
+                            </h5>
+
+                            <div class="row g-4 mb-4">
+                                <div class="col-12">
+                                    <div class="p-3 bg-light rounded-3 border-start border-4 border-danger">
+                                        <label class="fw-bold text-secondary small d-block mb-1">Họ tên Phụ huynh</label>
+                                        <div class="fs-4 fw-bold text-dark">@(Model.ParentName ?? "Chưa cập nhật")</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="p-3 bg-light rounded-3">
+                                        <label class="fw-bold text-secondary small d-block mb-1">Số điện thoại liên hệ</label>
+                                        <div class="fs-5 text-danger fw-bold">
+                                            <i class="bi bi-telephone-fill me-2"></i>@(Model.ParentPhone ?? "---")
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="p-3 bg-light rounded-3">
+                                        <label class="fw-bold text-secondary small d-block mb-1">Địa chỉ gia đình</label>
+                                        <div class="fs-5 text-dark">
+                                            <i class="bi bi-geo-alt-fill me-2 text-danger"></i>@(Model.Address ?? "---")
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h5 class="fw-bold text-uppercase text-muted mb-3 small ls-1 border-bottom pb-2 mt-5">
+                                <i class="bi bi-info-circle me-2"></i>Thông tin chi tiết Học sinh
+                            </h5>
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <span class="text-muted small d-block">Lớp sinh hoạt</span>
+                                    <span class="fw-bold fs-5">@Model.Class?.ClassName</span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="text-muted small d-block">Ngày sinh</span>
+                                    <span class="fw-bold fs-5">@Model.DateOfBirth.ToString("dd/MM/yyyy")</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

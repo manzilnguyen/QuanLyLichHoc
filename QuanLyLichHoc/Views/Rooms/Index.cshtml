@@ -1,0 +1,117 @@
+﻿@using QuanLyLichHoc.Models
+@model IEnumerable<QuanLyLichHoc.Models.Room>
+@{
+    ViewData["Title"] = "Quản lý Phòng học";
+    // Lấy giá trị filter cũ để map vào dropdown
+    var currentType = ViewData["TypeFilter"] as RoomType?;
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+<div class="container-fluid py-4">
+    <div class="card shadow-sm border-0 rounded-3">
+
+        <div class="card-header bg-white py-3">
+            <div class="row align-items-center">
+                <div class="col-lg-3 mb-2 mb-lg-0">
+                    <h4 class="mb-0 text-primary fw-bold"><i class="bi bi-building-fill me-2"></i>Phòng học</h4>
+                </div>
+
+                <div class="col-lg-6 mb-2 mb-lg-0">
+                    <form asp-action="Index" method="get" class="d-flex gap-2">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                            <input type="text" name="searchString" class="form-control border-start-0 bg-light"
+                                   placeholder="Tìm tên phòng..." value="@ViewData["CurrentFilter"]">
+                        </div>
+
+                        <select name="typeFilter" class="form-select w-50" asp-items="Html.GetEnumSelectList<RoomType>()" onchange="this.form.submit()">
+                            <option value="">-- Tất cả loại --</option>
+                            <!option value="@currentType" selected="@(currentType != null)"></!option>
+                        </select>
+
+                        <a asp-action="Index" class="btn btn-outline-secondary" title="Xóa lọc"><i class="bi bi-arrow-counterclockwise"></i></a>
+                    </form>
+                </div>
+
+                <div class="col-lg-3 text-lg-end">
+                    <a asp-action="Create" class="btn btn-primary rounded-pill px-4 shadow-sm">
+                        <i class="bi bi-plus-lg me-1"></i> Thêm phòng
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-secondary text-uppercase small fw-bold">
+                        <tr>
+                            <th class="ps-4 py-3">Tên phòng</th>
+                            <th class="py-3 text-center">Sức chứa</th>
+                            <th class="py-3 text-center">Loại phòng</th>
+                            <th class="py-3 text-end pe-4">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted">Không tìm thấy dữ liệu.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4 fw-bold text-dark">@item.RoomName</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-light text-dark border">
+                                            <i class="bi bi-people-fill me-1"></i> @item.Capacity
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        @if (item.Type == RoomType.Theory)
+                                        {
+                                            <span class="badge bg-info bg-opacity-10 text-info border border-info rounded-pill">Lý thuyết</span>
+                                        }
+                                        else if (item.Type == RoomType.Practice)
+                                        {
+                                            <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill">Thực hành/Lab</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning bg-opacity-10 text-warning border border-warning rounded-pill">Hội trường</span>
+                                        }
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning me-1">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        var msg = '@TempData["Success"]';
+        if (msg) {
+            Swal.fire({
+                toast: true, position: 'top-end', icon: 'success',
+                title: msg, showConfirmButton: false, timer: 3000
+            });
+        }
+    </script>
+}

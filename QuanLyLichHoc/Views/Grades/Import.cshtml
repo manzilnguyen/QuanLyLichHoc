@@ -1,0 +1,39 @@
+﻿@{
+    ViewData["Title"] = "Import Bảng Điểm";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow border-0 rounded-4">
+                <div class="card-header bg-success text-white py-3 rounded-top-4 text-center">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-file-earmark-excel-fill me-2"></i>Import Bảng Điểm</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-info small shadow-sm">
+                        <strong>Quy định file Excel:</strong>
+                        <ul class="mb-0 ps-3">
+                            <li>Cột A: Mã Sinh Viên</li>
+                            <li>Cột B: Mã Môn Học</li>
+                            <li>Cột C: Điểm số (0-10)</li>
+                            <li>Cột D: Học kỳ (VD: HK1-2025)</li>
+                        </ul>
+                    </div>
+
+                    <form asp-action="Import" method="post" enctype="multipart/form-data">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Chọn file Excel (.xlsx)</label>
+                            <input type="file" name="file" class="form-control" accept=".xlsx" required />
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success rounded-pill fw-bold shadow-sm">
+                                <i class="bi bi-upload me-2"></i> Tiến hành Import
+                            </button>
+                            <a asp-action="Index" class="btn btn-link text-decoration-none mt-2">Quay lại danh sách</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

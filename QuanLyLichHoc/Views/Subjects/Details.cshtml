@@ -1,0 +1,40 @@
+﻿@model QuanLyLichHoc.Models.Subject
+
+@{
+    ViewData["Title"] = "Chi tiết Môn học";
+}
+
+<div class="container py-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="m-0 fw-bold text-primary">
+                <i class="bi bi-info-circle me-2"></i> Thông tin Môn học
+            </h5>
+            <div>
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-sm">
+                    <i class="bi bi-pencil"></i> Sửa
+                </a>
+                <a asp-action="Index" class="btn btn-secondary btn-sm">
+                    <i class="bi bi-x-lg"></i> Đóng
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3 text-secondary text-uppercase small fw-bold">Mã môn học</dt>
+                <dd class="col-sm-9 fw-bold text-primary">@Html.DisplayFor(model => model.SubjectCode)</dd>
+
+                <dt class="col-sm-3 text-secondary text-uppercase small fw-bold">Tên môn học</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.SubjectName)</dd>
+
+                <dt class="col-sm-3 text-secondary text-uppercase small fw-bold">Số tín chỉ</dt>
+                <dd class="col-sm-9">
+                    <span class="badge bg-info text-dark">@Model.Credits Tín chỉ</span>
+                </dd>
+
+                <dt class="col-sm-3 text-secondary text-uppercase small fw-bold">Ngày tạo</dt>
+                <dd class="col-sm-9 text-muted">@(DateTime.Now.ToString("dd/MM/yyyy")) (Giả lập)</dd>
+            </dl>
+        </div>
+    </div>
+</div>

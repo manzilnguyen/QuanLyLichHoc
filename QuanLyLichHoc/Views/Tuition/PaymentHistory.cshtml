@@ -1,0 +1,121 @@
+﻿@model IEnumerable<QuanLyLichHoc.Models.TuitionFee>
+@{
+    ViewData["Title"] = "Sao kê học phí";
+    var student = ViewBag.Student as QuanLyLichHoc.Models.Student;
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 no-print">
+        <h3 class="fw-bold text-primary"><i class="bi bi-receipt-cutoff me-2"></i>Lịch sử giao dịch</h3>
+        <button onclick="window.print()" class="btn btn-outline-primary rounded-pill">
+            <i class="bi bi-printer-fill me-2"></i> In Sao kê
+        </button>
+    </div>
+
+    <div class="card border-0 shadow-sm" id="statement-paper">
+        <div class="card-body p-5">
+
+            <div class="row mb-5 border-bottom pb-4">
+                <div class="col-6">
+                    <h4 class="fw-bold text-uppercase text-primary mb-1">EduManager Pro</h4>
+                    <p class="text-muted small mb-0">Hệ thống quản lý đào tạo số 1</p>
+                </div>
+                <div class="col-6 text-end">
+                    <h2 class="fw-bold">BẢNG SAO KÊ HỌC PHÍ</h2>
+                    <p class="text-muted mb-0">Ngày xuất: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</p>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h6 class="text-muted text-uppercase small fw-bold">Thông tin học sinh</h6>
+                    <h5 class="fw-bold mb-1">@student?.FullName</h5>
+                    <p class="mb-0">Mã SV: <strong>@student?.StudentCode</strong></p>
+                    <p class="mb-0">Lớp: @student?.Class?.ClassName</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <h6 class="text-muted text-uppercase small fw-bold">Tổng tiền đã đóng</h6>
+                    <h2 class="fw-bold text-success">@(((decimal)ViewBag.TotalPaid).ToString("N0")) VNĐ</h2>
+                    <p class="text-muted">Tổng số giao dịch: @ViewBag.TotalTransactions</p>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-dark text-white">
+                        <tr>
+                            <th class="py-3 ps-3">Mã GD</th>
+                            <th class="py-3">Ngày thanh toán</th>
+                            <th class="py-3">Nội dung</th>
+                            <th class="py-3">Học kỳ</th>
+                            <th class="py-3 text-end pe-3">Số tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-3 fw-bold text-secondary">#@item.Id</td>
+                                    <td>@item.PaymentDate?.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>
+                                        <div class="fw-bold">@item.Title</div>
+                                        <small class="text-muted">Chuyển khoản / Webhook Auto</small>
+                                    </td>
+                                    <td><span class="badge bg-light text-dark border">@item.Semester</span></td>
+                                    <td class="text-end pe-3 fw-bold text-success">+ @item.Amount.ToString("N0")</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">Chưa phát sinh giao dịch nào.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="row mt-5 pt-4 border-top">
+                <div class="col-12 text-center text-muted small">
+                    <p class="mb-1">Cảm ơn bạn đã hoàn thành nghĩa vụ học phí.</p>
+                    <p>Mọi thắc mắc vui lòng liên hệ Phòng Tài chính: (024) 9999 8888</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @@media print {
+        body *
+
+    {
+        visibility: hidden;
+    }
+
+    #statement-paper, #statement-paper * {
+        visibility: visible;
+    }
+
+    #statement-paper {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        box-shadow: none !important;
+        border: none !important;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    .btn, header, footer, #chatbot-toggle {
+        display: none !important;
+    }
+
+    }
+</style>

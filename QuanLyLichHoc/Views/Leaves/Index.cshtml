@@ -1,0 +1,241 @@
+﻿@model IEnumerable<QuanLyLichHoc.Models.LeaveRequest>
+@{
+    ViewData["Title"] = "Quản lý nghỉ phép";
+    var pendingList = Model.Where(m => m.Status == QuanLyLichHoc.Models.LeaveStatus.Pending).ToList();
+    var historyList = Model.Where(m => m.Status != QuanLyLichHoc.Models.LeaveStatus.Pending).ToList();
+}
+
+<div class="container py-4">
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-primary mb-0"><i class="bi bi-calendar2-check me-2"></i>Quản lý Nghỉ phép</h3>
+            <p class="text-muted small mb-0">Theo dõi và xử lý các đơn từ sinh viên</p>
+        </div>
+        @if (User.IsInRole("Student"))
+        {
+            <a asp-action="Create" class="btn btn-primary rounded-pill px-4 shadow-sm">
+                <i class="bi bi-plus-lg me-1"></i> Soạn đơn mới
+            </a>
+        }
+    </div>
+
+    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-bold" id="pills-pending-tab" data-bs-toggle="pill" data-bs-target="#pills-pending" type="button" role="tab">
+                <i class="bi bi-hourglass-split me-1"></i> Chờ xử lý
+                <span class="badge bg-danger ms-1">@pendingList.Count</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold" id="pills-history-tab" data-bs-toggle="pill" data-bs-target="#pills-history" type="button" role="tab">
+                <i class="bi bi-clock-history me-1"></i> Lịch sử đơn
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="pills-tabContent">
+        <div class="tab-pane fade show active" id="pills-pending" role="tabpanel">
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-body p-0">
+                    @if (pendingList.Count == 0)
+                    {
+                        <div class="text-center py-5 text-muted">
+                            <i class="bi bi-check2-circle fs-1"></i>
+                            <p class="mt-2">Tuyệt vời! Không có đơn nào đang chờ xử lý.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="bg-light text-secondary small text-uppercase">
+                                    <tr>
+                                        <th class="ps-4">Ngày gửi</th>
+                                        @if (User.IsInRole("Lecturer"))
+                                        {
+                                            <th>Sinh viên</th>
+                                        }
+                                        <th>Lớp học</th>
+                                        <th>Ngày nghỉ</th>
+                                        <th style="width: 30%;">Lý do</th>
+                                        @if (User.IsInRole("Lecturer"))
+                                        {
+                                            <th class="text-end pe-4">Thao tác</th>
+                                        }
+                                        else
+                                        {
+                                            <th>Trạng thái</th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in pendingList)
+                                    {
+                                        <tr>
+                                            <td class="ps-4 text-muted small">@item.CreatedAt.ToString("dd/MM HH:mm")</td>
+                                            @if (User.IsInRole("Lecturer"))
+                                            {
+                                                <td class="fw-bold text-primary">@item.Student.FullName</td>
+                                            }
+                                            <td><span class="badge bg-light text-dark border">@item.Class.ClassName</span></td>
+                                            <td class="fw-bold text-danger">@item.LeaveDate.ToString("dd/MM/yyyy")</td>
+                                            <td><span class="d-inline-block text-truncate" style="max-width: 250px;" title="@item.Reason">@item.Reason</span></td>
+
+                                            @if (User.IsInRole("Lecturer"))
+                                            {
+                                                <td class="text-end pe-4">
+                                                    <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modalApprove-@item.Id">
+                                                        <i class="bi bi-check-lg"></i> Duyệt
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalReject-@item.Id">
+                                                        <i class="bi bi-x-lg"></i> Từ chối
+                                                    </button>
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                                <td><span class="badge bg-warning text-dark">Đang chờ GV</span></td>
+                                            }
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="pills-history" role="tabpanel">
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light text-secondary small text-uppercase">
+                                <tr>
+                                    <th class="ps-4">Ngày nghỉ</th>
+                                    @if (User.IsInRole("Lecturer"))
+                                    {
+                                        <th>Sinh viên</th>
+                                    }
+                                    <th>Lớp học</th>
+                                    <th>Lý do</th>
+                                    <th>Phản hồi của GV</th>
+                                    <th class="text-end pe-4">Kết quả</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in historyList)
+                                {
+                                    <tr>
+                                        <td class="ps-4">@item.LeaveDate.ToString("dd/MM/yyyy")</td>
+                                        @if (User.IsInRole("Lecturer"))
+                                        {
+                                            <td class="fw-bold">@item.Student.FullName</td>
+                                        }
+                                        <td>@item.Class.ClassName</td>
+                                        <td><small>@item.Reason</small></td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(item.ResponseNote))
+                                            {
+                                                <small class="text-muted fst-italic"><i class="bi bi-chat-quote me-1"></i>@item.ResponseNote</small>
+                                            }
+                                            else
+                                            {
+
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                        <td class="text-end pe-4">
+                                            @if (item.Status == QuanLyLichHoc.Models.LeaveStatus.Approved)
+                                            {
+                                                <span class="badge bg-success bg-opacity-10 text-success border border-success px-3 rounded-pill">Đã duyệt</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-3 rounded-pill">Đã từ chối</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (User.IsInRole("Lecturer"))
+{
+    @foreach (var item in pendingList)
+    {
+        <div class="modal fade" id="modalApprove-@item.Id" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form asp-action="Respond" method="post">
+                        <input type="hidden" name="id" value="@item.Id" />
+                        <input type="hidden" name="status" value="Approved" />
+                        <div class="modal-header bg-success text-white">
+                            <h5 class="modal-title">Duyệt đơn nghỉ phép</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Bạn xác nhận cho sinh viên <strong>@item.Student.FullName</strong> nghỉ ngày <strong>@item.LeaveDate.ToString("dd/MM/yyyy")</strong>?</p>
+                            <div class="form-floating">
+                                <textarea name="responseNote" class="form-control" placeholder="Ghi chú" style="height: 100px"></textarea>
+                                <label>Ghi chú / Lời nhắn (Tùy chọn)</label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Đóng</button>
+                            <button type="submit" class="btn btn-success">Xác nhận Duyệt</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalReject-@item.Id" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form asp-action="Respond" method="post">
+                        <input type="hidden" name="id" value="@item.Id" />
+                        <input type="hidden" name="status" value="Rejected" />
+                        <div class="modal-header bg-danger text-white">
+                            <h5 class="modal-title">Từ chối đơn nghỉ</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Từ chối đơn của sinh viên <strong>@item.Student.FullName</strong>?</p>
+                            <div class="form-floating">
+                                <textarea name="responseNote" class="form-control" placeholder="Lý do" style="height: 100px" required></textarea>
+                                <label>Lý do từ chối (Bắt buộc)</label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Đóng</button>
+                            <button type="submit" class="btn btn-danger">Xác nhận Từ chối</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+}

@@ -1,0 +1,56 @@
+﻿@{
+    ViewData["Title"] = "Xếp lịch tự động";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-success text-white text-center py-3 rounded-top-4">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-robot me-2"></i>Xếp Lịch Tự Động (Auto-Schedule)</h5>
+                </div>
+                <div class="card-body p-4">
+
+                    <div class="alert alert-warning small">
+                        <i class="bi bi-exclamation-circle-fill me-1"></i>
+                        <strong>Nguyên tắc xếp lịch:</strong>
+                        <ul class="mb-0 ps-3">
+                            <li>Ưu tiên tìm các Phòng Trống có sức chứa phù hợp.</li>
+                            <li>Tự động tránh trùng lịch với Lớp, Phòng và Giảng viên.</li>
+                            <li>Khung giờ chuẩn: Sáng (7-9, 9-11), Chiều (13-15, 15-17).</li>
+                        </ul>
+                    </div>
+
+                    <form asp-action="AutoArrange" method="post">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">1. Chọn Lớp cần xếp lịch</label>
+                            <select name="classId" class="form-select form-select-lg" asp-items="ViewBag.ClassId"></select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">2. Chọn các Môn học (Giữ Ctrl để chọn nhiều)</label>
+                            <select name="subjectIds" class="form-select select2" multiple="multiple" asp-items="ViewBag.SubjectIds" style="height: 200px;"></select>
+                            <small class="text-muted">Hệ thống sẽ lần lượt tìm chỗ trống cho các môn này.</small>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg fw-bold shadow-sm" onclick="return confirm('Hệ thống sẽ bắt đầu tính toán và chèn dữ liệu. Bạn có chắc chắn?')">
+                                <i class="bi bi-play-circle-fill me-2"></i> Chạy Thuật Toán Xếp Lịch
+                            </button>
+                            <a asp-action="Index" class="btn btn-light">Quay lại</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('.select2').select2({ theme: 'bootstrap-5', width: '100%', placeholder: "Chọn các môn học..." });
+        });
+    </script>
+}

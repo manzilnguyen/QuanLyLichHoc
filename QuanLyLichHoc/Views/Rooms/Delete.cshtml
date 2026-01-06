@@ -1,0 +1,45 @@
+﻿@model QuanLyLichHoc.Models.Room
+@{
+    ViewData["Title"] = "Xóa Phòng học";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger shadow border-0 rounded-4">
+                <div class="card-header bg-danger text-white text-center py-3 rounded-top-4">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-exclamation-octagon-fill me-2"></i>XÁC NHẬN XÓA</h5>
+                </div>
+                <div class="card-body p-4 text-center">
+                    <h5 class="card-title text-danger mb-3">Bạn chắc chắn muốn xóa phòng này?</h5>
+                    <p class="text-muted small">Hành động này không thể hoàn tác nếu phòng chưa có lịch học.</p>
+
+                    <div class="list-group list-group-flush text-start mb-4 shadow-sm rounded-3">
+                        <div class="list-group-item d-flex justify-content-between">
+                            <span class="fw-bold text-secondary">Tên phòng:</span>
+                            <span class="fw-bold text-primary">@Model.RoomName</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between">
+                            <span class="fw-bold text-secondary">Sức chứa:</span>
+                            <span>@Model.Capacity người</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between">
+                            <span class="fw-bold text-secondary">Loại phòng:</span>
+                            <span>@Html.DisplayFor(model => model.Type)</span>
+                        </div>
+                    </div>
+
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-flex justify-content-center gap-3">
+                            <a asp-action="Index" class="btn btn-secondary rounded-pill px-4">Quay lại</a>
+                            <button type="submit" class="btn btn-danger rounded-pill px-4 shadow-sm">
+                                <i class="bi bi-trash-fill me-1"></i> Xóa ngay
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

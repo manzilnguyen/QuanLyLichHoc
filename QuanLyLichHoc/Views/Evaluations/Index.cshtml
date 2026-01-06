@@ -1,0 +1,59 @@
+﻿@model IEnumerable<QuanLyLichHoc.Models.LecturerEvaluation>
+@{
+    ViewData["Title"] = "Quản lý Đánh giá";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold text-dark"><i class="bi bi-star-half me-2 text-warning"></i>Quản lý Đánh giá Giảng viên</h3>
+    </div>
+
+    <div class="card shadow border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 datatable">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-3">Thời gian</th>
+                            <th>Sinh viên</th>
+                            <th>Giảng viên</th>
+                            <th>Điểm</th>
+                            <th style="width: 40%;">Nhận xét</th>
+                            <th class="text-center">Tác vụ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-3 text-muted small">@item.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>
+                                    <div class="fw-bold">@item.Student?.FullName</div>
+                                    <div class="small text-muted">@item.Student?.StudentCode</div>
+                                    @if (item.IsAnonymous)
+                                    {
+                                        <span class="badge bg-secondary" style="font-size: 0.6rem;">Ẩn danh</span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="text-primary fw-bold">@item.Lecturer?.FullName</span>
+                                </td>
+                                <td>
+                                    <span class="fw-bold text-warning">@item.Rating <i class="bi bi-star-fill"></i></span>
+                                </td>
+                                <td>
+                                    <div class="text-wrap fst-italic">"@item.Comment"</div>
+                                </td>
+                                <td class="text-center">
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" onclick="return confirm('Bạn có chắc muốn xóa đánh giá này không?');">
+                                        <i class="bi bi-trash-fill"></i> Xóa
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

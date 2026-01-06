@@ -1,0 +1,101 @@
+﻿@model QuanLyLichHoc.Models.ViewModels.StudentResultViewModel
+@{
+    ViewData["Title"] = "Kết quả học tập";
+}
+
+<div class="container mt-4">
+    <div class="card shadow mb-4 border-left-primary">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    <div class="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center mx-auto mb-2" style="width: 80px; height: 80px; font-size: 2rem; font-weight: bold;">
+                        @(Model.Student?.FullName.Substring(0, 1).ToUpper())
+                    </div>
+                    <h5 class="fw-bold mb-0">@Model.Student?.FullName</h5>
+                    <small class="text-muted">@Model.Student?.StudentCode</small>
+                </div>
+
+                <div class="col-md-10">
+                    <div class="row text-center">
+                        <div class="col-md-4 border-end">
+                            <h6 class="text-muted text-uppercase small fw-bold">Học kỳ 1</h6>
+                            <h2 class="display-6 fw-bold text-primary">@Model.GpaHK1</h2>
+                            <span class="badge @GetBadgeClass(Model.RankHK1)">@Model.RankHK1</span>
+                        </div>
+
+                        <div class="col-md-4 border-end">
+                            <h6 class="text-muted text-uppercase small fw-bold">Học kỳ 2</h6>
+                            <h2 class="display-6 fw-bold text-info">@Model.GpaHK2</h2>
+                            <span class="badge @GetBadgeClass(Model.RankHK2)">@Model.RankHK2</span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <h6 class="text-muted text-uppercase small fw-bold">Cả Năm</h6>
+                            <h2 class="display-6 fw-bold text-danger">@Model.GpaYear</h2>
+                            <span class="badge @GetBadgeClass(Model.RankYear)">@Model.RankYear</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header bg-white py-3">
+            <h5 class="m-0 fw-bold text-primary"><i class="bi bi-table"></i> Bảng điểm chi tiết</h5>
+        </div>
+        <div class="card-body">
+            @if (!Model.Grades.Any())
+            {
+                <div class="alert alert-warning text-center">Chưa có điểm môn nào.</div>
+            }
+            else
+            {
+                <table class="table table-bordered table-hover datatable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Môn học</th>
+                            <th>Số tín chỉ</th>
+                            <th>Học kỳ</th>
+                            <th>Điểm số</th>
+                            <th>Đánh giá môn</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Grades.OrderBy(g => g.Semester))
+                        {
+                            <tr>
+                                <td class="fw-bold text-primary">@item.Subject.SubjectName</td>
+                                <td class="text-center">@item.Subject.Credits</td>
+                                <td class="text-center"><span class="badge bg-light text-dark border">@item.Semester</span></td>
+                                <td class="text-center fw-bold fs-5">@item.Score</td>
+                                <td class="text-center">
+                                    @if (item.Score >= 5)
+                                    {
+                                        <span class="text-success"><i class="bi bi-check-circle-fill"></i> Đạt</span>
+                                    }
+                                    else
+                                    {
+
+                                        <span class="text-danger"><i class="bi bi-x-circle-fill"></i> Trượt</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetBadgeClass(string rank)
+    {
+        if (rank == "Xuất sắc") return "bg-success";
+        if (rank == "Giỏi") return "bg-primary";
+        if (rank == "Khá") return "bg-info";
+        if (rank == "Trung bình") return "bg-warning text-dark";
+        return "bg-danger";
+    }
+}

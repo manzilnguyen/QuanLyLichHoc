@@ -1,0 +1,55 @@
+﻿@using QuanLyLichHoc.Models
+@model Room
+@{
+    ViewData["Title"] = "Cập nhật Phòng học";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-warning bg-opacity-75 text-dark text-center py-3 rounded-top-4">
+                    <h5 class="mb-0 fw-bold">CẬP NHẬT PHÒNG</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Edit">
+                        <input type="hidden" asp-for="Id" />
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="RoomName" class="form-control" placeholder="Tên phòng" />
+                            <label asp-for="RoomName">Tên phòng</label>
+                            <span asp-validation-for="RoomName" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Capacity" class="form-control" type="number" placeholder="Sức chứa" />
+                            <label asp-for="Capacity">Sức chứa</label>
+                            <span asp-validation-for="Capacity" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-floating mb-4">
+                            <select asp-for="Type" class="form-select" asp-items="Html.GetEnumSelectList<RoomType>()"></select>
+                            <label asp-for="Type">Loại phòng</label>
+                            <span asp-validation-for="Type" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-outline-secondary">Hủy</a>
+                            <button type="submit" class="btn btn-warning px-4 fw-bold shadow-sm">
+                                <i class="bi bi-check-circle me-1"></i> Lưu thay đổi
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}

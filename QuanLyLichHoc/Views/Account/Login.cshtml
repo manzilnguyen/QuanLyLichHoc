@@ -1,0 +1,166 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập hệ thống | Cổng Đào Tạo</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+        }
+
+        .login-card {
+            width: 400px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+            .login-card:hover {
+                transform: translateY(-5px);
+            }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+            .login-header i {
+                font-size: 50px;
+                color: #764ba2;
+                margin-bottom: 15px;
+            }
+
+            .login-header h3 {
+                font-weight: 600;
+                color: #333;
+            }
+
+        .form-control {
+            border-radius: 10px;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+        }
+
+            .form-control:focus {
+                box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.2);
+                border-color: #764ba2;
+            }
+
+        .input-group-text {
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            color: #764ba2;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, #667eea, #764ba2);
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: 500;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+            .btn-primary:hover {
+                background: linear-gradient(to right, #764ba2, #667eea);
+                transform: scale(1.02);
+                box-shadow: 0 5px 15px rgba(118, 75, 162, 0.4);
+            }
+
+        .alert-danger {
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .footer-text {
+            margin-top: 20px;
+            font-size: 13px;
+            color: #6c757d;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="login-header">
+            <!-- Icon đại diện -->
+            <i class="fas fa-graduation-cap"></i>
+            <h3>Cổng Đào Tạo</h3>
+            <p class="text-muted text-small">Vui lòng đăng nhập để tiếp tục</p>
+        </div>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger d-flex align-items-center" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <div>@ViewBag.Error</div>
+            </div>
+        }
+
+        <form method="post" action="/Account/Login">
+            <div class="mb-4">
+                <label class="form-label fw-bold text-secondary small">Tên đăng nhập</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                    <input type="text" name="username" class="form-control" required placeholder="Nhập tên đăng nhập" />
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-bold text-secondary small">Mật khẩu</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                    <input type="password" name="password" class="form-control" required placeholder="Nhập mật khẩu" />
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="rememberMe">
+                    <label class="form-check-label small text-secondary" for="rememberMe">
+                        Ghi nhớ tôi
+                    </label>
+                </div>
+                <a href="#" class="small text-decoration-none" style="color: #764ba2;">Quên mật khẩu?</a>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+                Đăng nhập <i class="fas fa-arrow-right ms-2"></i>
+            </button>
+        </form>
+
+        <div class="footer-text">
+            <small>Thông tin mặc định: <strong>admin / 123456</strong></small>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS (Optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,347 @@
+﻿@model IEnumerable<QuanLyLichHoc.Models.ChatMessage>
+@using QuanLyLichHoc.Models
+@using QuanLyLichHoc.Controllers
+
+@{
+    ViewData["Title"] = ViewBag.RoomDisplayName;
+    var sidebarRooms = ViewBag.SidebarRooms as List<ChatRoomViewModel>;
+    var members = ViewBag.Members as List<AppUser>;
+    var currentUserId = User.Identity.Name;
+
+    // NHẬN BIẾN QUYỀN TỪ CONTROLLER (An toàn và chính xác hơn)
+    bool canManage = ViewBag.CanManage != null && (bool)ViewBag.CanManage;
+}
+
+<style>
+    /* CSS giữ nguyên */
+    html, body {
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .chat-layout {
+        height: calc(100vh - 70px);
+        display: flex;
+        overflow: hidden;
+        background-color: #fff;
+        border: 1px solid #e3e6f0;
+        border-radius: 0.35rem;
+    }
+
+    .chat-sidebar {
+        width: 320px;
+        border-right: 1px solid #e3e6f0;
+        display: flex;
+        flex-direction: column;
+        background-color: #f8f9fc;
+    }
+
+    .chat-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background-color: #fff;
+        position: relative;
+    }
+
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .message-row {
+        display: flex;
+        align-items: flex-end;
+        max-width: 75%;
+    }
+
+        .message-row.me {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message-row.other {
+            align-self: flex-start;
+        }
+
+    .bubble {
+        padding: 10px 15px;
+        border-radius: 18px;
+        font-size: 0.95rem;
+        word-wrap: break-word;
+    }
+
+    .message-row.me .bubble {
+        background-color: #0d6efd;
+        color: white;
+        border-bottom-right-radius: 2px;
+    }
+
+    .message-row.other .bubble {
+        background-color: #f1f0f0;
+        color: black;
+        border-bottom-left-radius: 2px;
+    }
+
+    .sender-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #ccc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        margin: 0 8px;
+        color: #fff;
+        font-weight: bold;
+    }
+
+    .sender-name {
+        font-size: 0.75rem;
+        color: #888;
+        margin-bottom: 2px;
+        margin-left: 5px;
+    }
+
+    .chat-input-area {
+        padding: 10px;
+        border-top: 1px solid #e3e6f0;
+        background-color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    @@media (max-width: 768px) {
+        .chat-sidebar {
+            display: none;
+        }
+
+        .chat-layout {
+            height: calc(100vh - 120px);
+        }
+    }
+</style>
+
+<div class="container-fluid p-0 mt-2">
+    <div class="chat-layout shadow-sm">
+        <div class="chat-sidebar">
+            <div class="p-3 border-bottom bg-white d-flex justify-content-between align-items-center">
+                <h5 class="m-0 fw-bold text-primary">Chat</h5>
+                @if (User.IsInRole("Admin") || User.IsInRole("Lecturer"))
+                {
+                    <a asp-action="CreateGroup" class="btn btn-sm btn-outline-primary rounded-circle"><i class="bi bi-plus-lg"></i></a>
+                }
+            </div>
+            <div class="overflow-auto flex-grow-1">
+                @if (sidebarRooms != null)
+                {
+                    foreach (var room in sidebarRooms)
+                    {
+                        bool isActive = room.RoomName == ViewBag.RoomName;
+                        <a href="/Chat/Room?roomName=@room.RoomName" class="text-decoration-none text-dark">
+                            <div class="p-3 border-bottom d-flex align-items-center @(isActive ? "bg-primary bg-opacity-10" : "bg-white hover-bg-light")">
+                                <div class="position-relative me-3">
+                                    @if (!string.IsNullOrEmpty(room.Avatar))
+                                    {
+                                        <img src="@room.Avatar" class="rounded-circle" style="width: 45px; height: 45px; object-fit: cover;">
+                                    }
+                                    else
+                                    {
+
+                                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; font-weight: bold;">@room.DisplayName.Substring(0, 1)</div>
+                                    }
+                                </div>
+                                <div class="overflow-hidden">
+                                    <div class="fw-bold text-truncate">@room.DisplayName</div>
+                                    <small class="text-muted">@room.Type</small>
+                                </div>
+                            </div>
+                        </a>
+                    }
+                }
+            </div>
+        </div>
+
+        <div class="chat-main">
+            <div class="p-3 border-bottom bg-white d-flex align-items-center justify-content-between shadow-sm" style="z-index: 10;">
+                <div class="d-flex align-items-center">
+                    <a href="/Chat/Index" class="btn btn-sm btn-light me-2 d-md-none"><i class="bi bi-arrow-left"></i></a>
+                    <div class="fw-bold fs-5">
+                        @if (ViewBag.RoomAvatar != null)
+                        {
+                            <img src="@ViewBag.RoomAvatar" class="rounded-circle me-2" style="width:35px;height:35px">
+                        }
+                        @ViewBag.RoomDisplayName
+                    </div>
+                </div>
+                <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="offcanvas" data-bs-target="#infoOffcanvas"><i class="bi bi-info-circle"></i></button>
+            </div>
+
+            <div class="chat-messages" id="chatBox">
+                @foreach (var msg in Model)
+                {
+                    bool isMe = msg.Sender.Username == currentUserId;
+                    string displayName = msg.Sender.Username;
+                    if (msg.Sender.Role == "Admin") displayName = "Quản trị viên";
+                    else if (msg.Sender.Role == "Lecturer" && msg.Sender.Lecturer != null) displayName = msg.Sender.Lecturer.FullName;
+                    else if (msg.Sender.Role == "Student" && msg.Sender.Student != null) displayName = msg.Sender.Student.FullName;
+
+                    string avatarChar = displayName.Length > 0 ? displayName.Substring(0, 1) : "?";
+
+                    <div class="message-row @(isMe ? "me" : "other")">
+                        @if (!isMe)
+                        {
+                            <div class="sender-avatar" title="@displayName">@avatarChar</div>
+                        }
+                        <div>
+                            @if (!isMe)
+                            {
+                                <div class="sender-name">@displayName</div>
+                            }
+                            <div class="bubble">
+                                @if (msg.Type == MessageType.Text)
+                                {
+                                    <span>@msg.Content</span>
+                                }
+                                else if (msg.Type == MessageType.Image)
+                                {
+
+                                    <img src="@msg.FileUrl" style="max-width:200px;border-radius:10px" onclick="window.open(this.src)">
+                                }
+                                else
+                                {
+
+                                    <a href="@msg.FileUrl" target="_blank">File đính kèm</a>
+                                }
+                            </div>
+                            <div style="font-size:0.7rem;color:#ccc;margin-top:2px;text-align:@(isMe ? "right" : "left")">@msg.Timestamp.ToString("HH:mm")</div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="chat-input-area">
+                <button class="btn btn-light rounded-circle text-primary" onclick="$('#imageInput').click()"><i class="bi bi-image"></i></button>
+                <button class="btn btn-light rounded-circle text-primary" onclick="$('#fileInput').click()"><i class="bi bi-paperclip"></i></button>
+                <input type="text" id="messageInput" class="form-control rounded-pill bg-light border-0" placeholder="Nhập tin nhắn..." autocomplete="off">
+                <button class="btn btn-primary rounded-circle" id="sendButton"><i class="bi bi-send-fill"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="infoOffcanvas">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title">Thông tin nhóm</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div class="text-center mb-4">
+            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-2" style="width:80px;height:80px;font-size:2rem">
+                @ViewBag.RoomDisplayName.ToString().Substring(0, 1)
+            </div>
+            <h5 class="fw-bold">@ViewBag.RoomDisplayName</h5>
+        </div>
+        <hr />
+
+        <h6 class="fw-bold text-muted mb-3">Thành viên (@(members?.Count ?? 0))</h6>
+        <ul class="list-group list-group-flush">
+            @if (members != null)
+            {
+                foreach (var m in members)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <div>
+                            <span class="fw-bold">@m.Username</span>
+                            @if (m.Role == "Admin")
+                            {
+                                <span class="badge bg-danger">QTV</span>
+                            }
+                            @if (m.Role == "Lecturer")
+                            {
+                                <span class="badge bg-success">GV</span>
+                            }
+                        </div>
+
+                        @if (canManage && m.Username != currentUserId)
+                        {
+                            <button class="btn btn-sm btn-outline-danger border-0" onclick="kickMember(@m.Id)" title="Mời ra khỏi nhóm">
+                                <i class="bi bi-person-x-fill"></i>
+                            </button>
+                        }
+                    </li>
+                }
+            }
+        </ul>
+
+        @if (canManage && (User.IsInRole("Admin") || ViewBag.CreatorId != null))
+        {
+            <div class="mt-5 d-grid">
+                <button class="btn btn-danger" onclick="deleteGroup()">
+                    <i class="bi bi-trash-fill me-2"></i> Giải tán nhóm
+                </button>
+            </div>
+        }
+    </div>
+</div>
+
+<input type="file" id="imageInput" accept="image/*" hidden>
+<input type="file" id="fileInput" hidden>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+    <script>
+        var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
+        var roomName = "@ViewBag.RoomName";
+        var currentUsername = "@ViewBag.CurrentUser";
+
+        function scrollToBottom() { var chatBox = document.getElementById("chatBox"); chatBox.scrollTop = chatBox.scrollHeight; }
+
+        connection.on("ReceiveMessage", function (u, m, f, t, time) {
+            // (Logic nhận tin nhắn giữ nguyên như cũ, chỉ render HTML append vào chatBox)
+            location.reload(); // Cách đơn giản nhất để load lại tin nhắn mới nhất đầy đủ avatar
+        });
+
+        connection.start().then(() => { connection.invoke("JoinRoom", roomName); scrollToBottom(); });
+        $("#sendButton").click(send);
+        $("#messageInput").keypress(function(e) { if(e.which == 13) send(); });
+
+        function send() {
+            var msg = $("#messageInput").val().trim();
+            if(msg) { connection.invoke("SendMessage", roomName, currentUsername, msg, null, 0); $("#messageInput").val("").focus(); }
+        }
+
+        $("#imageInput").change(function() { upload(this.files[0], 1); });
+        $("#fileInput").change(function() { upload(this.files[0], 2); });
+
+        function upload(file, type) {
+            if(!file) return;
+            var fd = new FormData(); fd.append("file", file);
+            $.ajax({ url: '/Chat/UploadFile', type: 'POST', data: fd, contentType: false, processData: false, success: function(res) { connection.invoke("SendMessage", roomName, currentUsername, res.fileName, res.url, type); } });
+        }
+
+        // --- HÀM XÓA NHÓM ---
+        function deleteGroup() {
+            if(confirm("Hành động này sẽ xóa vĩnh viễn tin nhắn và giải tán nhóm. Bạn có chắc không?")) {
+                $.post("/Chat/DeleteChatRoom", { roomName: roomName })
+                .done(function() { window.location.href = "/Chat/Index"; })
+                .fail(function() { alert("Lỗi: Không thể xóa nhóm."); });
+            }
+        }
+
+        // --- HÀM KICK THÀNH VIÊN ---
+        function kickMember(userId) {
+            if(confirm("Bạn muốn mời thành viên này ra khỏi nhóm?")) {
+                $.post("/Chat/KickMember", { roomName: roomName, userId: userId })
+                .done(function() { location.reload(); })
+                .fail(function() { alert("Lỗi: Không thể xóa thành viên."); });
+            }
+        }
+    </script>
+}

@@ -1,0 +1,56 @@
+﻿@model IEnumerable<QuanLyLichHoc.Models.SystemNotification>
+@{
+    ViewData["Title"] = "Lịch sử thông báo";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold text-dark">📢 Lịch sử thông báo hệ thống</h3>
+        <a asp-action="Create" class="btn btn-success shadow-sm"><i class="bi bi-plus-lg me-1"></i> Soạn tin mới</a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Thời gian</th>
+                        <th>Tiêu đề</th>
+                        <th>Loại</th>
+                        <th>Nội dung</th>
+                        <th class="text-center">Xóa</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="text-muted small">@item.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="fw-bold text-primary">@item.Title</td>
+                            <td>
+                                @if (item.Type == "Info")
+                                {
+                                    <span class="badge bg-info bg-opacity-10 text-info border border-info">Info</span>
+                                }
+                                else if (item.Type == "Warning")
+                                {
+
+                                    <span class="badge bg-warning bg-opacity-10 text-warning border border-warning">Warning</span>
+                                }
+                                else
+                                {
+
+                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger">Urgent</span>
+                                }
+                            </td>
+                            <td class="text-muted">@item.Content</td>
+                            <td class="text-center">
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger border-0" onclick="return confirm('Xóa tin này?')"><i class="bi bi-trash"></i></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,43 @@
+﻿@model QuanLyLichHoc.Models.Class
+@{
+    ViewData["Title"] = "Xóa Lớp học";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger shadow border-0 rounded-4">
+                <div class="card-header bg-danger text-white text-center py-3 rounded-top-4">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i>XÁC NHẬN XÓA LỚP</h5>
+                </div>
+                <div class="card-body p-4 text-center">
+                    <h5 class="card-title text-danger mb-3">Bạn có chắc chắn muốn xóa lớp học này?</h5>
+                    <div class="alert alert-warning text-start small">
+                        <i class="bi bi-info-circle me-1"></i> Lưu ý: Việc xóa lớp học có thể ảnh hưởng đến danh sách sinh viên và lịch học liên quan.
+                    </div>
+
+                    <div class="list-group list-group-flush text-start mb-4 shadow-sm rounded-3">
+                        <div class="list-group-item d-flex justify-content-between">
+                            <span class="fw-bold text-secondary">Tên lớp:</span>
+                            <span class="fw-bold text-primary">@Model.ClassName</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between">
+                            <span class="fw-bold text-secondary">Niên khóa:</span>
+                            <span>@Model.AcademicYear</span>
+                        </div>
+                    </div>
+
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-flex justify-content-center gap-3">
+                            <a asp-action="Index" class="btn btn-secondary rounded-pill px-4">Quay lại</a>
+                            <button type="submit" class="btn btn-danger rounded-pill px-4 shadow-sm">
+                                <i class="bi bi-trash-fill me-1"></i> Xóa ngay
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

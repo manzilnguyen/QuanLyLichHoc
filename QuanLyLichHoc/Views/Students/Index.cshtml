@@ -1,0 +1,132 @@
+﻿@model IEnumerable<QuanLyLichHoc.Models.Student>
+@{
+    ViewData["Title"] = "Quản lý Học sinh";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+<div class="container-fluid py-4">
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-white py-3">
+            <div class="row align-items-center">
+                <div class="col-lg-3 mb-2 mb-lg-0">
+                    <h4 class="mb-0 text-primary fw-bold"><i class="bi bi-mortarboard-fill me-2"></i>Học sinh</h4>
+                </div>
+
+                <div class="col-lg-5 mb-2 mb-lg-0">
+                    <form asp-action="Index" method="get" class="d-flex gap-2">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                            <input type="text" name="searchString" class="form-control border-start-0 bg-light"
+                                   placeholder="Tên hoặc Mã SV..." value="@ViewData["CurrentFilter"]">
+                        </div>
+
+                        <select name="filterClassId" class="form-select w-50" asp-items="ViewBag.ClassList" onchange="this.form.submit()">
+                            <option value="">-- Tất cả Lớp --</option>
+                            <!option value="@ViewData["CurrentClass"]" selected="@(ViewData["CurrentClass"] != null)"></!option>
+                        </select>
+                        <a asp-action="Index" class="btn btn-outline-secondary" title="Reset"><i class="bi bi-arrow-counterclockwise"></i></a>
+                    </form>
+                </div>
+
+                <div class="col-lg-4 text-lg-end">
+                    <div class="btn-group shadow-sm">
+                        <a asp-action="Export" class="btn btn-outline-success" title="Xuất Excel">
+                            <i class="bi bi-file-earmark-arrow-down-fill"></i> Xuất
+                        </a>
+                        <a asp-action="Import" class="btn btn-success" title="Nhập Excel">
+                            <i class="bi bi-file-earmark-spreadsheet"></i> Nhập
+                        </a>
+                        <a asp-action="Create" class="btn btn-primary">
+                            <i class="bi bi-person-plus-fill me-1"></i> Thêm
+                        </a>
+                        <a asp-action="AutoCreateAccounts" class="btn btn-warning" onclick="return confirm('Tạo tài khoản tự động cho tất cả HS chưa có?')" title="Tạo TK tự động">
+                            <i class="bi bi-magic"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-secondary text-uppercase small fw-bold">
+                        <tr>
+                            <th class="ps-4 py-3">Mã SV</th>
+                            <th class="py-3">Họ và Tên</th>
+                            <th class="py-3">Ngày sinh</th>
+                            <th class="py-3">Lớp sinh hoạt</th>
+                            <th class="py-3 text-end pe-4">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">Không tìm thấy dữ liệu.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4 fw-bold text-primary">@item.StudentCode</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded-circle bg-primary bg-opacity-10 text-primary fw-bold d-flex justify-content-center align-items-center me-3"
+                                                 style="width: 35px; height: 35px; font-size: 0.9rem;">
+                                                @(string.IsNullOrEmpty(item.FullName) ? "?" : item.FullName.Substring(0, 1).ToUpper())
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-dark">@item.FullName</div>
+                                                @if (!string.IsNullOrEmpty(item.PhoneNumber))
+                                                {
+                                                    <small class="text-muted"><i class="bi bi-phone"></i> @item.PhoneNumber</small>
+                                                }
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>@item.DateOfBirth.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        @if (item.Class != null)
+                                        {
+                                            <span class="badge bg-info bg-opacity-10 text-info border border-info rounded-pill px-3">
+                                                @item.Class.ClassName
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary rounded-pill">Chưa phân lớp</span>
+                                        }
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="btn-group">
+                                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></a>
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil-square"></i></a>
+                                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-white py-3">
+            <small class="text-muted">Tổng số: <strong>@Model.Count()</strong> học sinh.</small>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        var successMsg = '@TempData["Success"]';
+        var errorMsg = '@TempData["Error"]';
+        if (successMsg) Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: successMsg, showConfirmButton: false, timer: 3000 });
+        if (errorMsg) Swal.fire({ icon: 'error', title: 'Lỗi', text: errorMsg });
+    </script>
+}

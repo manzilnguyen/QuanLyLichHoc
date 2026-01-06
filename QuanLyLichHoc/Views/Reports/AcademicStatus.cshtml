@@ -1,0 +1,179 @@
+﻿@model QuanLyLichHoc.Models.ViewModels.AcademicReportViewModel
+@{
+    ViewData["Title"] = "Báo cáo học tập";
+    bool hasData = Model.Students.Any();
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-primary mb-0"><i class="bi bi-pie-chart-fill me-2"></i>Báo Cáo Học Tập</h3>
+            <p class="text-muted small mb-0">Phân tích chuyên cần và kết quả học tập</p>
+        </div>
+
+        <form method="get" class="d-flex gap-2">
+            <select name="classId" class="form-select" asp-items="ViewBag.ClassId" onchange="this.form.submit()">
+                <option value="">-- Chọn lớp để xem --</option>
+            </select>
+            @if (hasData)
+            {
+                <button type="button" class="btn btn-outline-success" onclick="window.print()"><i class="bi bi-printer"></i> In</button>
+            }
+        </form>
+    </div>
+
+    @if (hasData)
+    {
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card shadow-sm border-start border-success border-4 h-100">
+                    <div class="card-body">
+                        <div class="text-uppercase small fw-bold text-success mb-1">Xuất sắc & Giỏi</div>
+                        <div class="h3 mb-0 fw-bold">@Model.CountExcellent</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card shadow-sm border-start border-primary border-4 h-100">
+                    <div class="card-body">
+                        <div class="text-uppercase small fw-bold text-primary mb-1">Khá</div>
+                        <div class="h3 mb-0 fw-bold">@Model.CountGood</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card shadow-sm border-start border-danger border-4 h-100">
+                    <div class="card-body">
+                        <div class="text-uppercase small fw-bold text-danger mb-1">Nguy cơ cấm thi</div>
+                        <div class="h3 mb-0 fw-bold">@Model.CountBanned</div>
+                        <small class="text-muted">Vắng > 20%</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card shadow-sm border-start border-info border-4 h-100">
+                    <div class="card-body">
+                        <div class="text-uppercase small fw-bold text-info mb-1">Điểm TB Lớp</div>
+                        <div class="h3 mb-0 fw-bold">@Model.ClassAverageScore</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-white py-3"><h6 class="m-0 fw-bold text-primary">Phổ điểm & Xếp loại</h6></div>
+                    <div class="card-body">
+                        <canvas id="barChart" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-white py-3"><h6 class="m-0 fw-bold text-primary">Tỉ lệ Cấm thi</h6></div>
+                    <div class="card-body">
+                        <canvas id="pieChart" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h6 class="m-0 fw-bold text-primary">Chi tiết Sinh viên</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-secondary text-uppercase small">
+                            <tr>
+                                <th class="ps-4">Mã SV</th>
+                                <th>Họ Tên</th>
+                                <th>Chuyên cần</th>
+                                <th class="text-center">Điểm TB</th>
+                                <th>Đánh giá</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Students)
+                            {
+                                <tr>
+                                    <td class="ps-4 font-monospace fw-bold text-primary">@item.StudentCode</td>
+                                    <td class="fw-bold">@item.FullName</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress flex-grow-1 me-2" style="height: 6px; width: 100px;">
+                                                <div class="progress-bar @(item.AttendancePercentage < 80 ? "bg-danger" : "bg-success")"
+                                                     role="progressbar" style="width: @item.AttendancePercentage%"></div>
+                                            </div>
+                                            <span class="small fw-bold">@item.AttendancePercentage%</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        @if (item.AverageScore > 0)
+                                        {
+                                            <span class="badge bg-light text-dark border">@item.AverageScore</span>
+                                        }
+                                        else
+                                        {
+
+                                            <span class="text-muted small">-</span>
+                                        }
+                                    </td>
+                                    <td><span class="fw-bold @item.StatusColor">@item.StatusLabel</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" width="120" class="mb-3 opacity-50" />
+            <h5 class="text-muted">Vui lòng chọn lớp để xem báo cáo</h5>
+        </div>
+    }
+</div>
+
+@if (hasData)
+{
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // 1. Biểu đồ Cột (Xếp loại)
+        new Chart(document.getElementById('barChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Xuất sắc', 'Khá', 'Trung bình', 'Yếu', 'Cấm thi'],
+                datasets: [{
+                    label: 'Số lượng SV',
+                    data: [@Model.CountExcellent, @Model.CountGood, @Model.CountAverage, @Model.CountWeak, @Model.CountBanned],
+                    backgroundColor: ['#1cc88a', '#4e73df', '#f6c23e', '#858796', '#e74a3b'],
+                    borderRadius: 5
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        // 2. Biểu đồ Tròn (Cấm thi)
+        var total = @Model.Students.Count;
+        var banned = @Model.CountBanned;
+        var safe = total - banned;
+
+        new Chart(document.getElementById('pieChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Đủ điều kiện', 'Cấm thi'],
+                datasets: [{
+                    data: [safe, banned],
+                    backgroundColor: ['#1cc88a', '#e74a3b'],
+                    hoverOffset: 4
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    </script>
+}

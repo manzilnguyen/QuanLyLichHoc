@@ -1,0 +1,41 @@
+﻿@{
+    ViewData["Title"] = "Tạo nhóm chat mới";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-people-fill"></i> Tạo Nhóm Chat Mới</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="CreateGroup" method="post" enctype="multipart/form-data">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tên nhóm chat</label>
+                            <input type="text" name="groupName" class="form-control" placeholder="Ví dụ: Nhóm dự án A..." required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Ảnh đại diện nhóm</label>
+                            <input type="file" name="avatar" class="form-control" accept="image/*" />
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Thêm thành viên</label>
+                            <select name="memberIds" class="form-select select2" multiple="multiple" asp-items="ViewBag.Users" required>
+                            </select>
+                            <small class="text-muted">Giữ Ctrl để chọn nhiều người hoặc nhập tên để tìm kiếm.</small>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Index" class="btn btn-secondary me-2">Hủy bỏ</a>
+                            <button type="submit" class="btn btn-success px-4">Tạo nhóm</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

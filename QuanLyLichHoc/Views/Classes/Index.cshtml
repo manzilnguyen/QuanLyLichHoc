@@ -1,0 +1,117 @@
+﻿@model IEnumerable<QuanLyLichHoc.Models.Class>
+@{
+    ViewData["Title"] = "Quản lý Lớp học";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+<div class="container-fluid py-4">
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-white py-3">
+            <div class="row align-items-center">
+                <div class="col-lg-3">
+                    <h4 class="mb-0 text-primary fw-bold"><i class="bi bi-mortarboard-fill me-2"></i>Lớp Học</h4>
+                </div>
+
+                <div class="col-lg-7 my-2 my-lg-0">
+                    <form asp-action="Index" method="get" class="d-flex gap-2">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                            <input type="text" name="searchString" class="form-control border-start-0 bg-light"
+                                   placeholder="Tên lớp hoặc niên khóa..." value="@ViewData["CurrentFilter"]">
+                        </div>
+
+                        <select name="lecturerId" class="form-select w-50"
+                                asp-items="ViewBag.LecturerList">
+                            <option value="">-- Tất cả GVCN --</option>
+                            <!option value="@ViewData["CurrentLecturer"]" selected="@(ViewData["CurrentLecturer"] != null)"></!option>
+                        </select>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-funnel"></i> Lọc</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary" title="Reset"><i class="bi bi-arrow-counterclockwise"></i></a>
+                    </form>
+                </div>
+
+                <div class="col-lg-2 text-lg-end">
+                    <a asp-action="Create" class="btn btn-success rounded-pill px-3 shadow-sm">
+                        <i class="bi bi-plus-lg"></i> Thêm mới
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-secondary text-uppercase small fw-bold">
+                        <tr>
+                            <th class="ps-4 py-3">Tên lớp</th>
+                            <th class="py-3">Niên khóa</th>
+                            <th class="py-3">Sĩ số tối đa</th>
+                            <th class="py-3">GV Chủ nhiệm</th>
+                            <th class="py-3 text-end pe-4">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">Không tìm thấy lớp học nào.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4 fw-bold text-primary">@item.ClassName</td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border">
+                                            <i class="bi bi-calendar-event me-1"></i> @item.AcademicYear
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <i class="bi bi-people me-1 text-muted"></i> @item.MaxQuantity
+                                    </td>
+                                    <td>
+                                        @if (item.Lecturer != null)
+                                        {
+                                            <span class="d-flex align-items-center text-success fw-semibold">
+                                                <i class="bi bi-person-badge me-2"></i> @item.Lecturer.FullName
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary rounded-pill">
+                                                Chưa phân công
+                                            </span>
+                                        }
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="btn-group">
+                                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info" title="Xem"><i class="bi bi-eye"></i></a>
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning" title="Sửa"><i class="bi bi-pencil-square"></i></a>
+                                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="Xóa"><i class="bi bi-trash"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        var msg = '@TempData["Success"]';
+        if (msg) {
+            Swal.fire({
+                toast: true, position: 'top-end', icon: 'success',
+                title: msg, showConfirmButton: false, timer: 3000
+            });
+        }
+    </script>
+}

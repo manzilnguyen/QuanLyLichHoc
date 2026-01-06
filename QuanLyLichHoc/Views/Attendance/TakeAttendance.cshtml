@@ -1,0 +1,198 @@
+﻿@model IEnumerable<QuanLyLichHoc.Models.Student>
+@using QuanLyLichHoc.Models
+@{
+    ViewData["Title"] = "Điểm danh lớp học";
+    var schedule = ViewBag.ScheduleInfo as Schedule;
+    var records = ViewBag.ExistingRecords as List<Attendance> ?? new List<Attendance>();
+
+    // Tính toán thống kê ban đầu
+    int total = Model.Count();
+    int present = records.Count(r => r.Status == AttendanceStatus.Approved);
+    int absent = total - present; // Tạm tính (nếu chưa điểm danh thì coi như vắng hoặc chờ)
+}
+
+<div class="container py-4">
+    <div class="card shadow-sm border-0 mb-4 bg-primary text-white rounded-3">
+        <div class="card-body d-flex justify-content-between align-items-center p-4">
+            <div>
+                <h6 class="text-uppercase opacity-75 mb-1">Điểm danh ngày @DateTime.Today.ToString("dd/MM/yyyy")</h6>
+                <h2 class="fw-bold mb-0"><i class="bi bi-calendar-check me-2"></i>@schedule.Class.ClassName</h2>
+                <p class="mb-0 mt-1"><i class="bi bi-book me-2"></i>Môn: @schedule.Subject?.SubjectName</p>
+            </div>
+            <div class="text-end d-none d-md-block">
+                <div class="display-6 fw-bold" id="stats-present">@present</div>
+                <small>Đang có mặt</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4 align-items-center sticky-top bg-white py-2 shadow-sm" style="z-index: 99; top: 60px; border-radius: 10px;">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-light border-0"><i class="bi bi-search"></i></span>
+                <input type="text" id="searchInput" class="form-control bg-light border-0" placeholder="Tìm tên hoặc mã sinh viên..." onkeyup="filterStudents()">
+            </div>
+        </div>
+        <div class="col-md-6 d-flex justify-content-between justify-content-md-end align-items-center gap-3">
+            <div class="d-flex align-items-center text-success">
+                <i class="bi bi-check-circle-fill me-1 fs-5"></i>
+                <span class="fw-bold fs-5" id="count-present">0</span>
+            </div>
+            <div class="d-flex align-items-center text-danger">
+                <i class="bi bi-x-circle-fill me-1 fs-5"></i>
+                <span class="fw-bold fs-5" id="count-absent">0</span>
+            </div>
+            <div class="vr mx-2"></div>
+            <div class="form-check form-switch m-0">
+                <input class="form-check-input" type="checkbox" id="checkAllToggle" onchange="toggleAll(this)">
+                <label class="form-check-label fw-bold" for="checkAllToggle">Chọn tất cả</label>
+            </div>
+        </div>
+    </div>
+
+    <form asp-action="SaveAttendance" method="post" id="attendanceForm">
+        <input type="hidden" name="scheduleId" value="@schedule.Id" />
+
+        <div class="row g-3" id="studentList">
+            @foreach (var student in Model)
+            {
+                var rec = records.FirstOrDefault(r => r.StudentId == student.Id);
+                // Mặc định: Nếu đã có record Approved thì check, hoặc nếu chưa có record nào thì check (giả định đi học đủ)
+                bool isChecked = (rec != null && rec.Status == AttendanceStatus.Approved) || (rec == null);
+                string cardBorder = isChecked ? "border-success" : "border-danger";
+                string bgClass = isChecked ? "bg-success bg-opacity-10" : "bg-white";
+
+                <div class="col-md-6 col-lg-4 student-card-wrapper" data-name="@student.FullName.ToLower()" data-code="@student.StudentCode.ToLower()">
+                    <div class="card h-100 shadow-sm transition-hover @cardBorder @bgClass student-card" id="card-@student.Id">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="form-check me-3">
+                                <input class="form-check-input attendance-check" type="checkbox"
+                                       name="presentStudentIds" value="@student.Id"
+                                       id="chk-@student.Id"
+                                       @(isChecked ? "checked" : "")
+                                       style="width: 25px; height: 25px; cursor: pointer;"
+                                       onchange="updateCardStatus(@student.Id)">
+                            </div>
+
+                            <div class="flex-shrink-0 me-3 position-relative">
+                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold fs-5" style="width: 50px; height: 50px;">
+                                    @student.FullName.Substring(0, 1)
+                                </div>
+                                @if (rec != null && !string.IsNullOrEmpty(rec.ProofImage))
+                                {
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning"
+                                          data-bs-toggle="tooltip" title="Có ảnh minh chứng">
+                                        <i class="bi bi-image"></i>
+                                    </span>
+                                }
+                            </div>
+
+                            <div class="flex-grow-1 overflow-hidden">
+                                <h6 class="fw-bold mb-0 text-truncate">@student.FullName</h6>
+                                <small class="text-muted font-monospace">@student.StudentCode</small>
+
+                                <div class="mt-2">
+                                    <input type="text" name="notes[@student.Id]"
+                                           class="form-control form-control-sm border-0 bg-transparent p-0 text-muted fst-italic"
+                                           placeholder="Ghi chú (vắng, muộn...)"
+                                           value="@(rec?.Note)">
+                                </div>
+                            </div>
+
+                            @if (rec != null && !string.IsNullOrEmpty(rec.ProofImage))
+                            {
+                                <button type="button" class="btn btn-sm btn-outline-info ms-2" onclick="window.open('@rec.ProofImage', '_blank')">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="fixed-bottom p-3 bg-white border-top shadow-lg d-flex justify-content-between align-items-center" style="z-index: 100;">
+            <span class="text-muted small ms-2"><i class="bi bi-info-circle"></i> Đừng quên lưu lại thay đổi</span>
+            <div>
+                <a asp-controller="Public" asp-action="MySchedule" class="btn btn-light border me-2">Hủy</a>
+                <button type="submit" class="btn btn-success fw-bold px-4 rounded-pill">
+                    <i class="bi bi-save me-1"></i> LƯU ĐIỂM DANH
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<style>
+    .transition-hover {
+        transition: all 0.3s ease;
+    }
+    /* Padding bottom để không bị nút Save che mất nội dung cuối */
+    body {
+        padding-bottom: 80px;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            updateStats(); // Tính toán ngay khi load trang
+        });
+
+        // 1. Cập nhật giao diện thẻ khi check/uncheck
+        function updateCardStatus(id) {
+            var checkbox = document.getElementById('chk-' + id);
+            var card = document.getElementById('card-' + id);
+
+            if (checkbox.checked) {
+                card.classList.remove('border-danger', 'bg-white');
+                card.classList.add('border-success', 'bg-success', 'bg-opacity-10');
+            } else {
+                card.classList.remove('border-success', 'bg-success', 'bg-opacity-10');
+                card.classList.add('border-danger', 'bg-white');
+            }
+            updateStats();
+        }
+
+        // 2. Tính toán thống kê thời gian thực
+        function updateStats() {
+            var total = @Model.Count();
+            var checkedCount = document.querySelectorAll('.attendance-check:checked').length;
+            var uncheckedCount = total - checkedCount;
+
+            document.getElementById('count-present').innerText = checkedCount;
+            document.getElementById('stats-present').innerText = checkedCount; // Header PC
+            document.getElementById('count-absent').innerText = uncheckedCount;
+        }
+
+        // 3. Tìm kiếm sinh viên (Client-side Search)
+        function filterStudents() {
+            var input = document.getElementById('searchInput').value.toLowerCase();
+            var cards = document.getElementsByClassName('student-card-wrapper');
+
+            for (var i = 0; i < cards.length; i++) {
+                var name = cards[i].getAttribute('data-name');
+                var code = cards[i].getAttribute('data-code');
+
+                if (name.includes(input) || code.includes(input)) {
+                    cards[i].classList.remove('d-none');
+                } else {
+                    cards[i].classList.add('d-none');
+                }
+            }
+        }
+
+        // 4. Chọn tất cả / Bỏ chọn tất cả
+        function toggleAll(source) {
+            var checkboxes = document.querySelectorAll('.attendance-check');
+            // Chỉ tác động những card đang hiển thị (đề phòng đang filter)
+            var visibleCards = document.querySelectorAll('.student-card-wrapper:not(.d-none) .attendance-check');
+
+            for (var i = 0; i < visibleCards.length; i++) {
+                visibleCards[i].checked = source.checked;
+                // Trigger event change thủ công để update màu sắc
+                updateCardStatus(visibleCards[i].value);
+            }
+        }
+    </script>
+}

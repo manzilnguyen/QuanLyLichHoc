@@ -1,0 +1,98 @@
+﻿@model dynamic
+@{
+    ViewData["Title"] = "Cập nhật hồ sơ";
+    bool isStudent = User.IsInRole("Student");
+    bool isParent = User.IsInRole("Parent");
+    bool isLecturer = User.IsInRole("Lecturer");
+}
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow border-0">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-person-gear me-2"></i>Cập nhật thông tin</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="UpdateProfile" method="post" enctype="multipart/form-data">
+
+                        <div class="mb-4 text-center">
+                            <div class="position-relative d-inline-block mb-3">
+                                <img id="preview" src="@(Model.Avatar ?? "https://via.placeholder.com/150")"
+                                     class="rounded-circle border shadow-sm" style="width: 120px; height: 120px; object-fit: cover;">
+                                <label for="avatarFile" class="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle p-2 cursor-pointer shadow" style="cursor: pointer;" title="Chọn ảnh mới">
+                                    <i class="bi bi-camera-fill"></i>
+                                </label>
+                            </div>
+                            <input type="file" id="avatarFile" name="avatarFile" class="d-none" accept="image/*" onchange="previewImage(this)">
+                            @if (isParent)
+                            {
+                                <div class="small text-muted fst-italic">Ảnh đại diện của học sinh</div>
+                            }
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-bold">@((isParent) ? "Tên học sinh (Con)" : "Họ và tên")</label>
+                                <input type="text" class="form-control bg-light" value="@Model.FullName" disabled readonly />
+                            </div>
+
+                            @if (!isParent)
+                            {
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Số điện thoại cá nhân</label>
+                                    <input type="text" name="phoneNumber" class="form-control" value="@Model.PhoneNumber" placeholder="09xxxx..." />
+                                </div>
+                            }
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Địa chỉ liên hệ</label>
+                                <input type="text" name="address" class="form-control" value="@Model.Address" placeholder="Nhập địa chỉ..." />
+                            </div>
+
+                            @if (isLecturer)
+                            {
+                                <div class="col-12">
+                                    <label class="form-label fw-bold">Email công việc</label>
+                                    <input type="email" name="email" class="form-control" value="@Model.Email" required />
+                                </div>
+                            }
+
+                            @if (isStudent || isParent)
+                            {
+                                <div class="col-12 mt-4">
+                                    <h6 class="text-primary fw-bold border-bottom pb-2"><i class="bi bi-people-fill me-2"></i>Thông tin Phụ huynh</h6>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Họ tên Phụ huynh</label>
+                                    <input type="text" name="parentName" class="form-control" value="@Model.ParentName" placeholder="Nhập tên cha/mẹ..." required />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">SĐT Phụ huynh</label>
+                                    <input type="text" name="parentPhone" class="form-control" value="@Model.ParentPhone" placeholder="SĐT liên lạc..." required />
+                                </div>
+                            }
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                            <a asp-action="Profile" class="btn btn-secondary px-4">Hủy bỏ</a>
+                            <button type="submit" class="btn btn-primary px-4 fw-bold">Lưu thay đổi</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('preview').src = e.target.result;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>

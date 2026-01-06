@@ -1,0 +1,99 @@
+﻿@model QuanLyLichHoc.Models.Grade
+@{
+    ViewData["Title"] = "Nhập điểm";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-primary text-white text-center py-3 rounded-top-4">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-pencil-square me-2"></i>Nhập Điểm Sinh Viên</h5>
+                </div>
+                <div class="card-body p-4 bg-light bg-opacity-10">
+
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger shadow-sm">@TempData["Error"]</div>
+                    }
+
+                    <form asp-action="Create">
+                        <div class="form-floating mb-3">
+                            <select id="ClassSelect" class="form-select fw-bold text-primary" asp-items="ViewBag.ClassList">
+                                <option value="" disabled selected>-- Chọn lớp trước --</option>
+                            </select>
+                            <label>Lọc theo Lớp</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <select asp-for="StudentId" id="StudentSelect" class="form-select">
+                                <option value="" disabled selected>-- Vui lòng chọn lớp phía trên --</option>
+                            </select>
+                            <label asp-for="StudentId">Sinh viên</label>
+                            <span asp-validation-for="StudentId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <select asp-for="SubjectId" class="form-select" asp-items="ViewBag.SubjectId"></select>
+                            <label asp-for="SubjectId">Môn học</label>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input asp-for="Score" class="form-control font-monospace fw-bold" type="number" step="0.1" min="0" max="10" placeholder="0-10" />
+                                    <label asp-for="Score">Điểm số (0-10)</label>
+                                    <span asp-validation-for="Score" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input asp-for="Semester" class="form-control" value="HK1-2025" />
+                                    <label asp-for="Semester">Học kỳ</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-3 border-top pt-3">
+                            <a asp-action="Index" class="btn btn-light rounded-pill px-4">Quay lại</a>
+                            <button type="submit" class="btn btn-primary px-5 py-2 fw-bold shadow-sm rounded-pill">
+                                <i class="bi bi-save me-1"></i> Lưu Điểm
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#ClassSelect').change(function() {
+                var classId = $(this).val();
+                if (classId) {
+                    $.ajax({
+                        url: '/Grades/GetStudentsByClass',
+                        type: 'GET',
+                        data: { classId: classId },
+                        success: function(data) {
+                            var stuSelect = $('#StudentSelect');
+                            stuSelect.empty();
+                            if (data.length === 0) {
+                                stuSelect.append('<option disabled>Lớp này chưa có sinh viên</option>');
+                            } else {
+                                $.each(data, function(i, item) {
+                                    stuSelect.append($('<option>', {
+                                        value: item.id,
+                                        text: item.name
+                                    }));
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

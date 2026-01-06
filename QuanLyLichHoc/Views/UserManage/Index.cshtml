@@ -1,0 +1,168 @@
+﻿@model IEnumerable<QuanLyLichHoc.Models.AppUser>
+@{
+    ViewData["Title"] = "Quản lý Tài khoản";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+<div class="container-fluid py-4">
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-white py-3">
+            <div class="row align-items-center">
+                <div class="col-lg-3">
+                    <h4 class="mb-0 text-primary fw-bold"><i class="bi bi-shield-lock-fill me-2"></i>Tài khoản</h4>
+                </div>
+
+                <div class="col-lg-4">
+                    <form asp-action="Index" method="get" class="d-flex gap-2">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                            <input type="text" name="searchString" class="form-control border-start-0 bg-light"
+                                   placeholder="Username hoặc Tên..." value="@ViewData["CurrentFilter"]">
+                        </div>
+                        <select name="roleFilter" class="form-select w-50" onchange="this.form.submit()">
+                            <option value="">-- Tất cả --</option>
+                            <!option value="Admin" selected="@((string)ViewData["CurrentRole"] == "Admin")">Admin</!option>
+                            <!option value="Lecturer" selected="@((string)ViewData["CurrentRole"] == "Lecturer")">Giảng viên</!option>
+                            <!option value="Student" selected="@((string)ViewData["CurrentRole"] == "Student")">Học sinh</!option>
+                            <!option value="Parent" selected="@((string)ViewData["CurrentRole"] == "Parent")">Phụ huynh</!option>
+                        </select>
+                    </form>
+                </div>
+
+                <div class="col-lg-5 text-lg-end">
+                    <div class="btn-group shadow-sm">
+                        <form asp-action="AutoGenerateAccounts" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-warning fw-bold text-dark"
+                                    onclick="return confirm('Hệ thống sẽ tạo tài khoản cho tất cả GV (Email) và HS (Mã SV) chưa có. Mật khẩu: 123. Tiếp tục?')">
+                                <i class="bi bi-lightning-charge-fill"></i> Auto SV/GV
+                            </button>
+                        </form>
+
+                        <form asp-action="AutoCreateParents" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-info fw-bold text-white"
+                                    onclick="return confirm('Tạo tài khoản Phụ huynh cho tất cả Học sinh? Quy tắc: [MãSV]PH / 123. Tiếp tục?')">
+                                <i class="bi bi-people-fill"></i> Auto PH
+                            </button>
+                        </form>
+
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="bi bi-plus-lg me-1"></i> Tạo thủ công
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" asp-action="CreateLecturerAccount"><i class="bi bi-person-badge me-2"></i>Cho Giảng viên</a></li>
+                            <li><a class="dropdown-item" asp-action="CreateStudentAccount"><i class="bi bi-mortarboard me-2"></i>Cho Học sinh</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-secondary text-uppercase small fw-bold">
+                        <tr>
+                            <th class="ps-4">Username</th>
+                            <th>Password</th>
+                            <th>Vai trò (Role)</th>
+                            <th>Chủ sở hữu</th>
+                            <th class="text-end pe-4">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-bold text-primary">@item.Username</td>
+
+                                <td class="text-muted font-monospace">******</td>
+
+                                <td>
+                                    @if (item.Role == "Admin")
+                                    {
+                                        <span class="badge bg-danger rounded-pill">Quản trị viên</span>
+                                    }
+                                    else if (item.Role == "Lecturer")
+                                    {
+                                        <span class="badge bg-success rounded-pill">Giảng viên</span>
+                                    }
+                                    else if (item.Role == "Student")
+                                    {
+                                        <span class="badge bg-info rounded-pill">Học sinh</span>
+                                    }
+                                    else if (item.Role == "Parent")
+                                    {
+                                        <span class="badge bg-warning text-dark rounded-pill">Phụ huynh</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.Role == "Lecturer" && item.Lecturer != null)
+                                    {
+                                        <i class="bi bi-person-video3 me-1 text-success"></i>
+                                        @item.Lecturer.FullName
+                                    }
+                                    else if (item.Role == "Student" && item.Student != null)
+                                    {
+                                        <i class="bi bi-person-lines-fill me-1 text-info"></i>
+                                        @item.Student.FullName
+                                    }
+                                    else if (item.Role == "Parent")
+                                    {
+                                        <i class="bi bi-person-heart me-1 text-warning"></i>
+                                        <span class="text-muted fst-italic">Phụ huynh của @item.Username.Replace("PH", "")</span>
+                                    }
+                                    else if (item.Role == "Admin")
+                                    {
+                                        <span class="text-danger fw-bold">Hệ thống</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted fst-italic">-- Chưa liên kết --</span>
+                                    }
+                                </td>
+                                <td class="text-end pe-4">
+                                    @if (item.Role != "Admin")
+                                    {
+                                        <div class="btn-group">
+                                            <form asp-action="ResetPassword" asp-route-id="@item.Id" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-outline-warning border-0"
+                                                        onclick="return confirm('Đặt lại mật khẩu về 123456?')"
+                                                        title="Reset Mật khẩu">
+                                                    <i class="bi bi-arrow-counterclockwise fs-5"></i>
+                                                </button>
+                                            </form>
+
+                                            <a asp-action="Delete" asp-route-id="@item.Id"
+                                               class="btn btn-sm btn-outline-danger border-0"
+                                               onclick="return confirm('Xóa tài khoản này? Người dùng sẽ không thể đăng nhập được nữa.')" title="Xóa">
+                                                <i class="bi bi-trash-fill fs-5"></i>
+                                            </a>
+                                        </div>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // SỬ DỤNG HTML.RAW ĐỂ TRÁNH LỖI FONT TIẾNG VIỆT
+        var successMsg = '@Html.Raw(TempData["Success"])';
+        var infoMsg = '@Html.Raw(TempData["Info"])';
+        var errorMsg = '@Html.Raw(TempData["Error"])';
+        var warningMsg = '@Html.Raw(TempData["Warning"])';
+
+        if (successMsg) Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: successMsg, showConfirmButton: false, timer: 3000 });
+        if (infoMsg) Swal.fire({ icon: 'info', title: 'Thông báo', text: infoMsg });
+        if (errorMsg) Swal.fire({ icon: 'error', title: 'Lỗi', text: errorMsg });
+        if (warningMsg) Swal.fire({ icon: 'warning', title: 'Lưu ý', text: warningMsg });
+    </script>
+}

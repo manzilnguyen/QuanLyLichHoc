@@ -1,0 +1,211 @@
+﻿<style>
+    .chatbot-toggler {
+        position: fixed;
+        bottom: 30px;
+        right: 35px;
+        outline: none;
+        border: none;
+        height: 50px;
+        width: 50px;
+        display: flex;
+        cursor: pointer;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #4f46e5;
+        transition: all 0.2s ease;
+        z-index: 9999;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+        .chatbot-toggler span {
+            color: #fff;
+            position: absolute;
+            font-size: 1.5rem;
+        }
+
+    .chatbot {
+        position: fixed;
+        right: 35px;
+        bottom: 90px;
+        width: 350px;
+        background: #fff;
+        border-radius: 15px;
+        overflow: hidden;
+        opacity: 0;
+        pointer-events: none;
+        transform: scale(0.5);
+        transform-origin: bottom right;
+        box-shadow: 0 0 128px 0 rgba(0,0,0,0.1), 0 32px 64px -48px rgba(0,0,0,0.5);
+        transition: all 0.1s ease;
+        z-index: 9998;
+        border: 1px solid #eee;
+    }
+
+    .show-chatbot .chatbot {
+        opacity: 1;
+        pointer-events: auto;
+        transform: scale(1);
+    }
+
+    .chatbot header {
+        background: #4f46e5;
+        padding: 16px 0;
+        position: relative;
+        text-align: center;
+    }
+
+        .chatbot header h2 {
+            color: #fff;
+            font-size: 1.2rem;
+            margin: 0;
+            font-weight: bold;
+        }
+
+    .chatbox {
+        overflow-y: auto;
+        height: 350px;
+        padding: 15px 20px 70px;
+        list-style: none;
+        background: #f8f9fa;
+    }
+
+        .chatbox .chat {
+            display: flex;
+            list-style: none;
+            margin-bottom: 15px;
+        }
+
+        .chatbox .outgoing {
+            justify-content: flex-end;
+        }
+
+            .chatbox .outgoing p {
+                background: #4f46e5;
+                color: #fff;
+                border-radius: 10px 10px 0 10px;
+                max-width: 75%;
+                padding: 10px 15px;
+                font-size: 0.9rem;
+                margin: 0;
+                word-wrap: break-word;
+            }
+
+        .chatbox .incoming p {
+            background: #fff;
+            color: #333;
+            border-radius: 10px 10px 10px 0;
+            max-width: 85%;
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            margin: 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            line-height: 1.5;
+        }
+
+    .chat-input {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        background: #fff;
+        padding: 5px 20px;
+        border-top: 1px solid #ddd;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+        .chat-input textarea {
+            height: 45px;
+            width: 100%;
+            border: none;
+            outline: none;
+            resize: none;
+            padding: 12px 0;
+            font-size: 0.95rem;
+        }
+
+        .chat-input span {
+            align-self: flex-end;
+            color: #4f46e5;
+            cursor: pointer;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            font-size: 1.3rem;
+        }
+</style>
+
+<button class="chatbot-toggler" onclick="document.body.classList.toggle('show-chatbot')">
+    <span class="bi bi-chat-dots-fill"></span>
+</button>
+
+<div class="chatbot">
+    <header>
+        <h2><i class="bi bi-robot me-2"></i>EduBot AI</h2>
+        <span class="position-absolute top-50 end-0 translate-middle-y me-3 text-white cursor-pointer" onclick="document.body.classList.remove('show-chatbot')"><i class="bi bi-x-lg"></i></span>
+    </header>
+    <ul class="chatbox" id="chatbox">
+        <li class="chat incoming">
+            <span class="bi bi-robot fs-4 me-2 align-self-end text-primary"></span>
+            <p>Xin chào! Tôi là trợ lý ảo AI. Tôi có thể giúp gì cho bạn?</p>
+        </li>
+    </ul>
+    <div class="chat-input">
+        <textarea placeholder="Nhập câu hỏi..." spellcheck="false" id="chatInput" required></textarea>
+        <span id="sendBtn" class="bi bi-send-fill"></span>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const chatInput = document.querySelector("#chatInput");
+        const sendBtn = document.querySelector("#sendBtn");
+        const chatbox = document.querySelector("#chatbox");
+
+        const createChatLi = (message, className) => {
+            const chatLi = document.createElement("li");
+            chatLi.classList.add("chat", className);
+            let content = className === "outgoing"
+                ? `<p></p>`
+                : `<span class="bi bi-robot fs-4 me-2 align-self-end text-primary"></span><p></p>`;
+            chatLi.innerHTML = content;
+            chatLi.querySelector("p").innerHTML = message;
+            return chatLi;
+        }
+
+        const handleChat = () => {
+            const userMessage = chatInput.value.trim();
+            if (!userMessage) return;
+
+            chatbox.appendChild(createChatLi(userMessage, "outgoing"));
+            chatbox.scrollTo(0, chatbox.scrollHeight);
+            chatInput.value = "";
+
+            const incomingChatLi = createChatLi('<div class="spinner-border spinner-border-sm text-primary"></div> Đang suy nghĩ...', "incoming");
+            chatbox.appendChild(incomingChatLi);
+            chatbox.scrollTo(0, chatbox.scrollHeight);
+
+            fetch("/ChatBot/Ask", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: userMessage })
+            })
+            .then(res => res.json())
+            .then(data => {
+                incomingChatLi.querySelector("p").innerHTML = data.answer;
+            })
+            .catch(() => {
+                incomingChatLi.querySelector("p").textContent = "Lỗi kết nối. Vui lòng thử lại.";
+            })
+            .finally(() => {
+                chatbox.scrollTo(0, chatbox.scrollHeight);
+            });
+        }
+
+        sendBtn.addEventListener("click", handleChat);
+        chatInput.addEventListener("keydown", (e) => {
+            if(e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleChat(); }
+        });
+    });
+</script>

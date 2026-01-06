@@ -1,0 +1,44 @@
+﻿@{
+    ViewData["Title"] = "Gửi Minh Chứng";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-warning bg-opacity-75 text-center py-3 rounded-top-4">
+                    <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-camera-fill me-2"></i>CHECK-IN ĐIỂM DANH</h5>
+                </div>
+                <div class="card-body p-4 text-center">
+
+                    <div class="mb-4">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3004/3004613.png" width="80" class="mb-3">
+                        <p class="text-muted">Vui lòng chụp ảnh lớp học hoặc selfie tại lớp để làm minh chứng.</p>
+                    </div>
+
+                    <form asp-action="CheckIn" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="scheduleId" value="@ViewBag.ScheduleId" />
+
+                        <div class="mb-3">
+                            <label class="btn btn-outline-primary w-100 py-3 border-2 border-dashed rounded-3 cursor-pointer hover-bg-light">
+                                <i class="bi bi-cloud-upload fs-2 d-block mb-1"></i>
+                                <span id="fileName">Chọn ảnh minh chứng...</span>
+                                <input type="file" name="proofImage" class="d-none" accept="image/*" required onchange="document.getElementById('fileName').innerText = this.files[0].name">
+                            </label>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-warning btn-lg fw-bold shadow-sm rounded-pill">
+                                <i class="bi bi-send-check-fill me-2"></i> GỬI XÁC NHẬN
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="mt-3">
+                        <a asp-action="MySchedule" class="text-decoration-none text-muted small"><i class="bi bi-arrow-left"></i> Quay lại lịch</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

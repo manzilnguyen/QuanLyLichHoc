@@ -1,0 +1,131 @@
+﻿@model IEnumerable<QuanLyLichHoc.Models.Lecturer>
+@{
+    ViewData["Title"] = "Quản lý Giảng viên";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+<div class="container-fluid py-4">
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-white py-3">
+            <div class="row align-items-center">
+                <div class="col-lg-3 mb-2 mb-lg-0">
+                    <h4 class="mb-0 text-primary fw-bold"><i class="bi bi-people-fill me-2"></i>Giảng viên</h4>
+                </div>
+
+                <div class="col-lg-5 mb-2 mb-lg-0">
+                    <form asp-action="Index" method="get" class="d-flex gap-2">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                            <input type="text" name="searchString" class="form-control border-start-0 bg-light"
+                                   placeholder="Tìm tên hoặc email..." value="@ViewData["CurrentFilter"]">
+                        </div>
+
+                        <select name="departmentFilter" class="form-select w-50" asp-items="ViewBag.Departments" onchange="this.form.submit()">
+                            <option value="">-- Tất cả Khoa --</option>
+                            <!option value="@ViewData["CurrentDept"]" selected="@(ViewData["CurrentDept"] != null)"></!option>
+                        </select>
+                        <a asp-action="Index" class="btn btn-outline-secondary" title="Reset"><i class="bi bi-arrow-counterclockwise"></i></a>
+                    </form>
+                </div>
+
+                <div class="col-lg-4 text-lg-end">
+                    <div class="btn-group shadow-sm">
+                        <a asp-action="Export" class="btn btn-outline-success">
+                            <i class="bi bi-file-earmark-arrow-down-fill me-1"></i> Xuất Excel
+                        </a>
+                        <a asp-action="Import" class="btn btn-success">
+                            <i class="bi bi-file-earmark-spreadsheet me-1"></i> Import
+                        </a>
+                        <a asp-action="Create" class="btn btn-primary">
+                            <i class="bi bi-plus-lg me-1"></i> Thêm mới
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-secondary text-uppercase small fw-bold">
+                        <tr>
+                            <th class="ps-4 py-3">Họ và Tên</th>
+                            <th class="py-3">Email liên hệ</th>
+                            <th class="py-3">Số điện thoại</th>
+                            <th class="py-3">Khoa / Bộ môn</th>
+                            <th class="py-3 text-end pe-4">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                    Không tìm thấy dữ liệu.
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded-circle bg-primary bg-opacity-10 text-primary fw-bold d-flex justify-content-center align-items-center me-3"
+                                                 style="width: 40px; height: 40px; font-size: 1rem;">
+                                                @(string.IsNullOrEmpty(item.FullName) ? "?" : item.FullName.Substring(0, 1).ToUpper())
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-dark">@item.FullName</div>
+                                                <small class="text-muted d-block d-md-none">@item.Email</small>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td><a href="mailto:@item.Email" class="text-decoration-none text-secondary"><i class="bi bi-envelope me-1"></i> @item.Email</a></td>
+                                    <td><span class="text-muted">@item.PhoneNumber</span></td>
+
+                                    <td>
+                                        <span class="badge bg-info bg-opacity-10 text-info border border-info rounded-pill px-3">
+                                            @item.Department
+                                        </span>
+                                    </td>
+
+                                    <td class="text-end pe-4">
+                                        <div class="btn-group">
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning" title="Sửa">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="Xóa">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-white py-3">
+            <small class="text-muted">Tổng số: <strong>@Model.Count()</strong> giảng viên.</small>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        var successMsg = '@TempData["Success"]';
+        var errorMsg = '@TempData["Error"]';
+        var warningMsg = '@TempData["Warning"]';
+
+        if (successMsg) Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: successMsg, showConfirmButton: false, timer: 3000 });
+        if (errorMsg) Swal.fire({ icon: 'error', title: 'Lỗi', text: errorMsg });
+        if (warningMsg) Swal.fire({ icon: 'warning', title: 'Lưu ý', text: warningMsg });
+    </script>
+}

@@ -1,0 +1,55 @@
+﻿@model IEnumerable<QuanLyLichHoc.Models.Schedule>
+@{
+    ViewData["Title"] = "Tra cứu Lịch học";
+}
+
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-info text-white">
+            <h3>🎓 Cổng thông tin Học sinh</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="StudentSchedule" method="get" class="row g-3 align-items-center mb-4">
+                <div class="col-auto">
+                    <label class="col-form-label fw-bold">Chọn Lớp của bạn:</label>
+                </div>
+                <div class="col-auto">
+                    @Html.DropDownList("classId", (IEnumerable<SelectListItem>)ViewBag.ClassId,
+                    "-- Chọn lớp --", new { @class = "form-select", onchange = "this.form.submit()" })
+                </div>
+            </form>
+
+            @if (Model != null && Model.Any())
+            {
+                <h5 class="text-primary mb-3">📅 Thời khóa biểu lớp: @Model.First().Class.ClassName</h5>
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Thứ</th>
+                            <th>Thời gian</th>
+                            <th>Môn học</th>
+                            <th>Phòng</th>
+                            <th>Giảng viên</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="fw-bold">@item.DayOfWeek</td>
+                                <td>@item.StartTime.ToString(@"hh\:mm") - @item.EndTime.ToString(@"hh\:mm")</td>
+                                <td>@item.Subject.SubjectName</td>
+                                <td><span class="badge bg-warning text-dark">@item.Room.RoomName</span></td>
+                                <td>@item.Lecturer.FullName</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else if (Context.Request.Query["classId"].Count > 0)
+            {
+                <div class="alert alert-warning">Chưa có lịch học nào cho lớp này.</div>
+            }
+        </div>
+    </div>
+</div>

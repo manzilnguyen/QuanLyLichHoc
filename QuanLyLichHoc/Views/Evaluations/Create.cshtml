@@ -1,0 +1,72 @@
+﻿@model QuanLyLichHoc.Models.LecturerEvaluation
+@{
+    ViewData["Title"] = "Đánh giá Giảng viên";
+}
+
+<style>
+    /* CSS cho Sao đánh giá */
+    .rating { display: flex; flex-direction: row-reverse; justify-content: center; gap: 5px; }
+    .rating input { display: none; }
+    .rating label { font-size: 2.5rem; color: #ccc; cursor: pointer; transition: color 0.2s; }
+    .rating label:hover, .rating label:hover ~ label, .rating input:checked ~ label { color: #ffc107; }
+</style>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-primary text-white text-center py-3">
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-star-fill me-2"></i>Đánh Giá Giảng Viên</h4>
+                </div>
+                <div class="card-body p-4">
+
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["Error"]</div>
+                    }
+
+                    <form asp-action="Create">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Chọn Giảng viên</label>
+                            <select asp-for="LecturerId" class="form-select form-select-lg" asp-items="ViewBag.LecturerId">
+                                <option disabled selected>-- Chọn GV bộ môn --</option>
+                            </select>
+                            <span asp-validation-for="LecturerId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3 text-center">
+                            <label class="form-label fw-bold d-block">Mức độ hài lòng</label>
+                            <div class="rating">
+                                <input type="radio" id="star5" name="Rating" value="5" /><label for="star5" title="Xuất sắc">★</label>
+                                <input type="radio" id="star4" name="Rating" value="4" /><label for="star4" title="Tốt">★</label>
+                                <input type="radio" id="star3" name="Rating" value="3" /><label for="star3" title="Bình thường">★</label>
+                                <input type="radio" id="star2" name="Rating" value="2" /><label for="star2" title="Tệ">★</label>
+                                <input type="radio" id="star1" name="Rating" value="1" /><label for="star1" title="Rất tệ">★</label>
+                            </div>
+                            <span asp-validation-for="Rating" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Nhận xét chi tiết</label>
+                            <textarea asp-for="Comment" class="form-control" rows="4" placeholder="Giảng viên dạy có dễ hiểu không? Tác phong thế nào?"></textarea>
+                            <span asp-validation-for="Comment" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" asp-for="IsAnonymous">
+                            <label class="form-check-label text-muted" for="IsAnonymous">
+                                Gửi đánh giá ẩn danh (Giảng viên sẽ không thấy tên bạn)
+                            </label>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-warning btn-lg fw-bold rounded-pill text-dark shadow-sm">
+                                Gửi Đánh Giá
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

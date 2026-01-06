@@ -1,0 +1,71 @@
+﻿@model QuanLyLichHoc.Models.Schedule
+
+@{
+    ViewData["Title"] = "Sửa Lịch Học";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow border-0">
+                <div class="card-header bg-warning bg-opacity-10 text-dark py-3">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-pencil-square me-2"></i> Cập nhật Lịch Học</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ClassId" class="form-label fw-bold">Lớp học</label>
+                                <select asp-for="ClassId" class="form-select select2" asp-items="ViewBag.ClassId"></select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="SubjectId" class="form-label fw-bold">Môn học</label>
+                                <select asp-for="SubjectId" class="form-select select2" asp-items="ViewBag.SubjectId"></select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="RoomId" class="form-label fw-bold">Phòng học</label>
+                                <select asp-for="RoomId" class="form-select select2" asp-items="ViewBag.RoomId"></select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LecturerId" class="form-label fw-bold">Giảng viên</label>
+                                <select asp-for="LecturerId" class="form-select select2" asp-items="ViewBag.LecturerId"></select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="DayOfWeek" class="form-label fw-bold">Thứ</label>
+                                <select asp-for="DayOfWeek" class="form-select" asp-items="Html.GetEnumSelectList<DayOfWeek>()"></select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="StartTime" class="form-label fw-bold">Bắt đầu</label>
+                                <input asp-for="StartTime" class="form-control" type="time" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="EndTime" class="form-label fw-bold">Kết thúc</label>
+                                <input asp-for="EndTime" class="form-control" type="time" />
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-3">
+                            <a asp-action="Index" class="btn btn-light border">Hủy bỏ</a>
+                            <button type="submit" class="btn btn-warning fw-bold px-4">Lưu thay đổi</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() { $('.select2').select2({ theme: 'bootstrap-5' }); });
+    </script>
+}

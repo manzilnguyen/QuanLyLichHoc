@@ -1,0 +1,63 @@
+﻿@using QuanLyLichHoc.Models
+@{
+    ViewData["Title"] = "Tạo khoản thu học phí";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow border-0 rounded-4">
+                <div class="card-header bg-success text-white py-3">
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-plus-circle me-2"></i>Tạo Khoản Thu Mới</h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-info border-0 bg-info bg-opacity-10 mb-4">
+                        <i class="bi bi-info-circle-fill me-2"></i> Khoản thu sẽ được tạo cho <strong>tất cả sinh viên</strong> trong lớp được chọn.
+                    </div>
+
+                    <form asp-action="Create" method="post">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Áp dụng cho Lớp</label>
+                            <select name="classId" class="form-select form-select-lg" asp-items="ViewBag.ClassId" required>
+                                <option value="" disabled selected>-- Chọn lớp học --</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nội dung khoản thu</label>
+                            <input type="text" name="title" class="form-control" placeholder="VD: Học phí Học kỳ 1, Tiền bảo hiểm..." required />
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Số tiền (VNĐ)</label>
+                                <div class="input-group">
+                                    <input type="number" name="amount" class="form-control" placeholder="VD: 5000000" min="0" step="1000" required />
+                                    <span class="input-group-text fw-bold">đ</span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Học kỳ áp dụng</label>
+                                <select name="semester" class="form-select">
+                                    <option value="HK1-@DateTime.Now.Year">HK1-@DateTime.Now.Year</option>
+                                    <option value="HK2-@DateTime.Now.Year">HK2-@DateTime.Now.Year</option>
+                                    <option value="HK3-@DateTime.Now.Year">HK3-@DateTime.Now.Year</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <hr class="my-4 opacity-10">
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a asp-action="Index" class="btn btn-secondary px-4">Quay lại</a>
+                            <button type="submit" class="btn btn-success px-4 fw-bold">
+                                <i class="bi bi-save me-2"></i> Tạo & Gửi thông báo
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

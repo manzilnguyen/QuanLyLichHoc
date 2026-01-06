@@ -1,0 +1,193 @@
+﻿@model IEnumerable<QuanLyLichHoc.Models.TuitionFee>
+@{
+    ViewData["Title"] = "Quản lý Học phí";
+    bool isAdmin = User.IsInRole("Admin");
+
+    // Dữ liệu cho biểu đồ
+    decimal totalRevenue = (decimal)ViewBag.TotalAmount;
+    int paidCount = ViewBag.PaidCount;
+    int unpaidCount = ViewBag.UnpaidCount;
+    decimal realRevenue = Model.Where(x => x.IsPaid).Sum(x => x.Amount);
+    double percent = totalRevenue > 0 ? (double)(realRevenue / totalRevenue) * 100 : 0;
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-primary"><i class="bi bi-cash-coin me-2"></i>Quản lý Tài chính</h3>
+            <p class="text-muted small mb-0">Theo dõi doanh thu & học phí</p>
+        </div>
+        @if (isAdmin)
+        {
+            <div class="d-flex gap-2">
+                <a asp-action="ExportToExcel" asp-route-classId="@Context.Request.Query["classId"]" asp-route-status="@Context.Request.Query["status"]" class="btn btn-outline-success rounded-pill">
+                    <i class="bi bi-file-earmark-excel-fill me-2"></i> Xuất Excel
+                </a>
+                <a asp-action="Create" class="btn btn-primary rounded-pill shadow-sm"><i class="bi bi-plus-lg"></i> Tạo khoản thu</a>
+            </div>
+        }
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-8">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="card bg-primary text-white border-0 shadow-sm h-100">
+                        <div class="card-body p-4">
+                            <h6 class="opacity-75">Tổng dự kiến thu</h6>
+                            <h2 class="fw-bold display-6">@totalRevenue.ToString("N0") <small class="fs-6">đ</small></h2>
+                            <div class="progress bg-white bg-opacity-25 mt-3" style="height: 6px;">
+                                <div class="progress-bar bg-white" style="width: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-success text-white border-0 shadow-sm h-100">
+                        <div class="card-body p-4">
+                            <h6 class="opacity-75">Thực thu (Đã đóng)</h6>
+                            <h2 class="fw-bold display-6">@realRevenue.ToString("N0") <small class="fs-6">đ</small></h2>
+                            <div class="progress bg-white bg-opacity-25 mt-3" style="height: 6px;">
+                                <div class="progress-bar bg-white" style="width: @percent%"></div>
+                            </div>
+                            <small class="mt-2 d-block">Đạt @Math.Round(percent, 1)% chỉ tiêu</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="fw-bold text-center mb-3">Tỷ lệ hoàn thành</h6>
+                    <div style="height: 180px;">
+                        <canvas id="tuitionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form class="row g-3 mb-4 bg-white p-3 rounded-4 shadow-sm border" method="get">
+        <div class="col-md-4">
+            <label class="form-label fw-bold small">Lọc theo lớp</label>
+            <select name="classId" class="form-select" asp-items="ViewBag.ClassId">
+                <option value="">-- Tất cả lớp --</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-bold small">Trạng thái đóng</label>
+            <select name="status" class="form-select">
+                <option value="">-- Tất cả trạng thái --</option>
+                <option value="Paid">Đã đóng</option>
+                <option value="Unpaid">Chưa đóng</option>
+            </select>
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100"><i class="bi bi-filter"></i> Lọc dữ liệu</button>
+        </div>
+    </form>
+
+    <div class="card shadow border-0 rounded-4 overflow-hidden">
+        <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 py-3">ID</th>
+                        <th>Sinh viên</th>
+                        <th>Lớp</th>
+                        <th>Nội dung thu</th>
+                        <th>Số tiền</th>
+                        <th>Trạng thái</th>
+                        <th class="text-end pe-4">Tác vụ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-4 fw-bold text-muted">#@item.Id</td>
+                            <td>
+                                <div class="fw-bold text-dark">@item.Student.FullName</div>
+                                <div class="small text-muted" style="font-size: 0.8rem;">@item.Student.StudentCode</div>
+                            </td>
+                            <td><span class="badge bg-light text-dark border">@item.Student.Class?.ClassName</span></td>
+                            <td>
+                                <div>@item.Title</div>
+                                <small class="text-muted">@item.Semester</small>
+                            </td>
+                            <td class="fw-bold text-primary">@item.Amount.ToString("N0") đ</td>
+                            <td>
+                                @if (item.IsPaid)
+                                {
+                                    <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill border border-success">
+                                        <i class="bi bi-check-circle-fill me-1"></i> Đã đóng
+                                    </span>
+                                    <div class="small text-muted mt-1" style="font-size: 0.75rem;">@item.PaymentDate?.ToString("dd/MM")</div>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill border border-danger">Chưa đóng</span>
+                                }
+                            </td>
+                            <td class="text-end pe-4">
+                                @if (!item.IsPaid)
+                                {
+                                    @if (isAdmin)
+                                    {
+                                        <form asp-action="ConfirmPayment" class="d-inline">
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button class="btn btn-sm btn-light text-success border-success" onclick="return confirm('Xác nhận thu tiền thủ công?')">
+                                                <i class="bi bi-check-lg"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                    <button class="btn btn-sm btn-light text-warning border-warning ms-1" onclick="remindStudent(@item.Id)">
+                                        <i class="bi bi-bell-fill"></i>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <span class="text-success"><i class="bi bi-shield-check fs-5"></i></span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Khởi tạo biểu đồ Chart.js
+    document.addEventListener("DOMContentLoaded", function() {
+        var ctx = document.getElementById('tuitionChart').getContext('2d');
+        var tuitionChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Đã đóng', 'Chưa đóng'],
+                datasets: [{
+                    data: [@paidCount, @unpaidCount],
+                    backgroundColor: ['#198754', '#dc3545'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+    });
+
+    // Hàm nhắc nhở
+    function remindStudent(id) {
+        if(confirm("Gửi thông báo nhắc nhở đóng tiền?")) {
+            $.post("/Tuition/Remind", { id: id }, function() {
+                Swal.fire('Thành công', 'Đã gửi nhắc nhở!', 'success');
+            });
+        }
+    }
+</script>

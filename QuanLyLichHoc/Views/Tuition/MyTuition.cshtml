@@ -1,0 +1,107 @@
+﻿@model IEnumerable<QuanLyLichHoc.Models.TuitionFee>
+@{
+    ViewData["Title"] = "Học phí của tôi";
+}
+
+<div class="container py-4">
+    <h3 class="fw-bold text-primary mb-4"><i class="bi bi-wallet2 me-2"></i>Thông tin Học phí</h3>
+
+    <div class="row g-4">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100 rounded-4 overflow-hidden">
+                    <div class="card-header @(item.IsPaid ? "bg-success" : "bg-danger") text-white py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0 fw-bold">@item.Title</h5>
+                            <span class="badge bg-white @(item.IsPaid ? "text-success" : "text-danger")">@item.Semester</span>
+                        </div>
+                    </div>
+                    <div class="card-body text-center p-4">
+                        <h2 class="display-6 fw-bold @(item.IsPaid ? "text-success" : "text-danger")">@item.Amount.ToString("N0") đ</h2>
+
+                        @if (item.IsPaid)
+                        {
+                            <div class="alert alert-success mt-3 mb-0">
+                                <i class="bi bi-check-circle-fill me-2"></i> Đã thanh toán
+                                <div class="small mt-1">Ngày: @item.PaymentDate?.ToString("dd/MM/yyyy HH:mm")</div>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted mt-2">Vui lòng thanh toán trước hạn.</p>
+
+                            <button class="btn btn-danger w-100 rounded-pill py-2 fw-bold shadow-sm mt-3"
+                                    onclick="showPaymentQR(@item.Id, '@item.Title', @item.Amount)">
+                                <i class="bi bi-qr-code-scan me-2"></i> Thanh toán ngay
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="modal fade" id="paymentModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold"><i class="bi bi-bank me-2"></i>Quét mã để thanh toán</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <p class="text-muted">Mở ứng dụng ngân hàng và quét mã bên dưới</p>
+
+                <img id="qrImage" src="" class="img-fluid border rounded-3 mb-3 shadow-sm" style="max-width: 300px;" />
+
+                <div class="bg-light p-3 rounded-3 text-start">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Ngân hàng:</span>
+                        <span class="fw-bold">MB Bank</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Số tài khoản:</span>
+                        <span class="fw-bold text-primary">999990303999</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Chủ tài khoản:</span>
+                        <span class="fw-bold">NGUYEN DUC MANH</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Nội dung:</span>
+                        <span class="fw-bold text-danger" id="qrContent">...</span>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning mt-3 small text-start">
+                    <i class="bi bi-info-circle me-1"></i> Sau khi chuyển khoản, hệ thống sẽ tự động duyệt sau vài phút (nếu đã cấu hình Auto Banking).
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // [SỬA LỖI 2]: Thêm tham số 'id' vào hàm
+    function showPaymentQR(id, title, amount) {
+        // Cấu hình tài khoản nhận tiền
+        const BANK_ID = "MB";
+        const ACCOUNT_NO = "999990303999";
+        const ACCOUNT_NAME = "NGUYEN DUC MANH";
+
+        // Nội dung CK: HP + ID (Ví dụ: HP105) -> Để hệ thống Auto Webhook nhận diện được
+        const description = `HP${id}`;
+
+        // Tạo link VietQR
+        const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(description)}&accountName=${encodeURIComponent(ACCOUNT_NAME)}`;
+
+        // Gán vào Modal
+        document.getElementById('qrImage').src = qrUrl;
+        document.getElementById('qrContent').innerText = description;
+
+        // Hiện Modal
+        var myModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+        myModal.show();
+    }
+</script>

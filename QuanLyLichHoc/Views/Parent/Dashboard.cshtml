@@ -1,0 +1,109 @@
+﻿@model QuanLyLichHoc.Models.Student
+@{
+    ViewData["Title"] = "Tổng quan học tập";
+
+    // Lấy dữ liệu thống kê từ Controller
+    double gpa = ViewBag.GPA ?? 0;
+    double attRate = ViewBag.AttendanceRate ?? 100;
+    string rank = ViewBag.AcademicRank ?? "Chưa xếp loại";
+
+    // Logic chọn màu sắc (Xanh/Vàng/Đỏ)
+    string gpaColor = gpa >= 8 ? "success" : (gpa >= 5 ? "warning" : "danger");
+    string attColor = attRate >= 90 ? "success" : (attRate >= 70 ? "warning" : "danger");
+}
+
+<div class="container py-4">
+    <div class="card bg-white border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-4">
+            <div class="d-flex align-items-center gap-4">
+                <div class="bg-primary bg-gradient text-white rounded-circle d-flex align-items-center justify-content-center fw-bold display-6" style="width: 80px; height: 80px;">
+                    @Model.FullName.Substring(0, 1)
+                </div>
+                <div>
+                    <h4 class="fw-bold mb-1">@Model.FullName</h4>
+                    <p class="text-muted mb-0">
+                        Mã SV: <span class="fw-bold text-dark me-3">@Model.StudentCode</span>
+                        Lớp: <span class="fw-bold text-dark">@(Model.Class?.ClassName ?? "N/A")</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100 rounded-4">
+                <div class="card-body p-4">
+                    <h6 class="text-muted text-uppercase small fw-bold mb-3"><i class="bi bi-mortarboard-fill me-2"></i>Kết quả học tập</h6>
+                    <div class="d-flex justify-content-between align-items-end mb-2">
+                        <span class="display-4 fw-bold text-@gpaColor">@gpa</span>
+                        <span class="badge bg-@gpaColor fs-6 mb-2 px-3 py-2 rounded-pill">@rank</span>
+                    </div>
+                    <div class="progress" style="height: 12px; background-color: #f0f0f0;">
+                        <div class="progress-bar bg-@gpaColor" role="progressbar" style="width: @(gpa * 10)%;"></div>
+                    </div>
+                    <small class="text-muted mt-2 d-block fst-italic">Điểm trung bình tích lũy (Thang 10)</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100 rounded-4">
+                <div class="card-body p-4">
+                    <h6 class="text-muted text-uppercase small fw-bold mb-3"><i class="bi bi-clock-history me-2"></i>Tỷ lệ chuyên cần</h6>
+                    <div class="d-flex justify-content-between align-items-end mb-2">
+                        <span class="display-4 fw-bold text-@attColor">@attRate%</span>
+                        <span class="badge bg-@attColor fs-6 mb-2 px-3 py-2 rounded-pill">@(attRate >= 80 ? "Tốt" : "Cảnh báo")</span>
+                    </div>
+                    <div class="progress" style="height: 12px; background-color: #f0f0f0;">
+                        <div class="progress-bar bg-@attColor" role="progressbar" style="width: @attRate%;"></div>
+                    </div>
+                    <small class="text-muted mt-2 d-block fst-italic">Dựa trên dữ liệu điểm danh hàng ngày</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-6 col-lg-3">
+            <a asp-action="ChildScores" class="btn btn-light w-100 h-100 p-4 border-0 shadow-sm text-start hover-box rounded-4">
+                <div class="mb-3 text-primary"><i class="bi bi-journal-text fs-1"></i></div>
+                <h6 class="fw-bold mb-1">Bảng điểm</h6>
+                <small class="text-muted">Xem điểm chi tiết</small>
+            </a>
+        </div>
+        <div class="col-6 col-lg-3">
+            <a asp-action="ChildSchedule" class="btn btn-light w-100 h-100 p-4 border-0 shadow-sm text-start hover-box rounded-4">
+                <div class="mb-3 text-warning"><i class="bi bi-calendar-week fs-1"></i></div>
+                <h6 class="fw-bold mb-1">Lịch học</h6>
+                <small class="text-muted">Thời khóa biểu</small>
+            </a>
+        </div>
+        <div class="col-6 col-lg-3">
+            <a asp-action="ChildAttendance" class="btn btn-light w-100 h-100 p-4 border-0 shadow-sm text-start hover-box rounded-4">
+                <div class="mb-3 text-danger"><i class="bi bi-clipboard-check fs-1"></i></div>
+                <h6 class="fw-bold mb-1">Điểm danh</h6>
+                <small class="text-muted">Lịch sử ra vào</small>
+            </a>
+        </div>
+        <div class="col-6 col-lg-3">
+            <a asp-action="ContactLecturers" class="btn btn-light w-100 h-100 p-4 border-0 shadow-sm text-start hover-box rounded-4">
+                <div class="mb-3 text-info"><i class="bi bi-chat-dots fs-1"></i></div>
+                <h6 class="fw-bold mb-1">Liên hệ GV</h6>
+                <small class="text-muted">Trao đổi với nhà trường</small>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-box {
+        transition: all 0.3s ease;
+    }
+
+        .hover-box:hover {
+            transform: translateY(-5px);
+            background-color: #fff !important;
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+        }
+</style>

@@ -1,0 +1,120 @@
+﻿@model IEnumerable<QuanLyLichHoc.Models.Subject>
+@{
+    ViewData["Title"] = "Quản lý Môn học";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+<div class="container-fluid py-4">
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-white py-3">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <h4 class="mb-0 text-primary fw-bold">
+                        <i class="bi bi-journal-bookmark-fill me-2"></i>Quản lý Môn học
+                    </h4>
+                </div>
+                <div class="col-md-4 my-2 my-md-0">
+                    <form asp-action="Index" method="get">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="bi bi-search text-muted"></i>
+                            </span>
+                            <input type="text" name="searchString" class="form-control border-start-0 bg-light"
+                                   placeholder="Tìm tên hoặc mã môn..."
+                                   value="@ViewData["CurrentFilter"]">
+                            <button class="btn btn-primary" type="submit">Tìm</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <a asp-action="Create" class="btn btn-success rounded-pill px-4 shadow-sm">
+                        <i class="bi bi-plus-lg me-1"></i> Thêm mới
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-secondary text-uppercase small fw-bold">
+                        <tr>
+                            <th class="ps-4 py-3">Mã môn [cite: 7]</th>
+                            <th class="py-3">Tên môn học</th>
+                            <th class="py-3 text-center">Số tín chỉ</th>
+                            <th class="py-3 text-end pe-4">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                    Không tìm thấy dữ liệu phù hợp.
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4 fw-bold text-primary">@item.SubjectCode</td>
+                                    <td class="fw-semibold">@item.SubjectName</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-info bg-opacity-10 text-info border border-info rounded-pill px-3">
+                                            @item.Credits TC
+                                        </span>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="btn-group" role="group">
+                                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary" title="Chi tiết">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning" title="Sửa">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="Xóa">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-white py-3">
+            <small class="text-muted">Tổng số: <strong>@Model.Count()</strong> môn học</small>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        var msg = '@TempData["Success"]';
+        if (msg) {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast.fire({
+                icon: 'success',
+                title: msg
+            })
+        }
+    </script>
+}

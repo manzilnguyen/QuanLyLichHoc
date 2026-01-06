@@ -1,0 +1,117 @@
+﻿@using QuanLyLichHoc.Controllers
+@model IEnumerable<AttendanceController.SessionViewModel>
+
+@{
+    ViewData["Title"] = "Lịch sử Điểm danh";
+}
+
+<div class="container-fluid py-4">
+    <div class="card shadow border-0 rounded-3">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold text-primary mb-0"><i class="bi bi-calendar-check me-2"></i>Quản lý Điểm danh</h5>
+            <div class="small">
+                <span class="badge bg-success bg-opacity-10 text-success border border-success me-1">Hôm nay</span>
+                <span class="badge bg-warning bg-opacity-10 text-warning border border-warning me-1">Tương lai</span>
+                <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary">Quá khứ</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle datatable" data-order='[[ 0, "desc" ]]'>
+                    <thead class="table-light">
+                        <tr>
+                            <th>Ngày tháng</th>
+                            <th>Lớp / Môn</th>
+                            <th>Thời gian</th>
+                            <th>Phòng</th>
+                            <th class="text-center">Trạng thái</th>
+                            <th class="text-center">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            bool isToday = item.Date == DateTime.Today;
+                            bool isFuture = item.Date > DateTime.Today;
+                            string rowClass = isToday ? "table-primary bg-opacity-10" : "";
+
+                            var sortValue = item.Date.ToString("yyyyMMdd") + item.Schedule.StartTime.ToString("hhmm");
+
+                            <tr class="@rowClass">
+                                <td class="fw-bold text-secondary" data-order="@sortValue">
+                                    @item.Date.ToString("dd/MM/yyyy") <br>
+                                    <small class="fw-normal text-muted">@item.Schedule.DayOfWeek</small>
+                                </td>
+                                <td>
+                                    <span class="fw-bold text-dark">@item.Schedule.Class.ClassName</span> <br>
+                                    <small class="text-muted">@item.Schedule.Subject.SubjectName</small>
+                                </td>
+                                <td>
+                                    @item.Schedule.StartTime.ToString(@"hh\:mm") - @item.Schedule.EndTime.ToString(@"hh\:mm")
+                                </td>
+                                <td><span class="badge bg-light text-dark border">@item.Schedule.Room.RoomName</span></td>
+
+                                <td class="text-center">
+                                    @if (isFuture)
+                                    {
+                                        <span class="badge bg-warning text-dark">Sắp tới</span>
+                                    }
+                                    else if (isToday)
+                                    {
+
+                                        <span class="badge bg-success animate-pulse">Đang diễn ra</span>
+                                    }
+                                    else
+                                    {
+
+                                        <span class="badge bg-secondary">Đã kết thúc</span>
+                                    }
+                                </td>
+
+                                <td class="text-center">
+                                    <div class="btn-group shadow-sm">
+                                        @if (!isFuture)
+                                        {
+                                            <a href="/Attendance/TakeAttendance?scheduleId=@item.Schedule.Id&date=@item.Date.ToString("yyyy-MM-dd")"
+                                               class="btn btn-sm btn-outline-primary fw-bold" title="Điểm danh">
+                                                <i class="bi bi-pen-fill"></i>
+                                            </a>
+                                            <a href="/Attendance/Export?scheduleId=@item.Schedule.Id&date=@item.Date.ToString("yyyy-MM-dd")"
+                                               class="btn btn-sm btn-outline-success fw-bold" title="Xuất Excel">
+                                                <i class="bi bi-file-earmark-spreadsheet-fill"></i>
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <button class="btn btn-sm btn-light text-muted" disabled><i class="bi bi-lock-fill"></i></button>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .animate-pulse {
+        animation: pulse 2s infinite;
+    }
+
+    @@keyframes pulse {
+        0% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.5;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+</style>

@@ -1,0 +1,48 @@
+﻿@{
+    ViewData["Title"] = "Import & Xếp lịch tự động";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-success text-white text-center py-3 rounded-top-4">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-file-earmark-spreadsheet-fill me-2"></i>Import & Xếp Lịch Tự Động</h5>
+                </div>
+                <div class="card-body p-4">
+
+                    <div class="alert alert-info border-0 bg-info bg-opacity-10 text-dark shadow-sm">
+                        <h6 class="fw-bold mb-2"><i class="bi bi-info-circle-fill me-2"></i>Cấu trúc file Excel (.xlsx):</h6>
+                        <ul class="mb-0 small ps-3">
+                            <li><strong>Cột A:</strong> Tên Lớp (VD: CNTT-K15)</li>
+                            <li><strong>Cột B:</strong> Tên Môn học</li>
+                            <li><strong>Cột C:</strong> Tên Giảng viên</li>
+                            <li><strong>Cột D:</strong> Loại hình dạy (Lý thuyết / Thực hành)</li>
+                            <li><strong>Cột E:</strong> Số tiết (VD: 3)</li>
+                        </ul>
+                    </div>
+
+                    <form asp-action="Import" method="post" enctype="multipart/form-data" class="mt-4">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Học kỳ áp dụng</label>
+                            <input type="text" name="semester" class="form-control" placeholder="VD: HK2-2025" required />
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Chọn file Excel</label>
+                            <input type="file" name="file" class="form-control" accept=".xlsx" required />
+                        </div>
+
+                        <div class="d-grid gap-2 d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-light rounded-pill px-4">Quay lại</a>
+                            <button type="submit" class="btn btn-success rounded-pill px-4 shadow-sm fw-bold">
+                                <i class="bi bi-gear-wide-connected me-1"></i> Xếp lịch tự động
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

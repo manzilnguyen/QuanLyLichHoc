@@ -1,0 +1,102 @@
+﻿@model QuanLyLichHoc.Models.Student
+@{
+    ViewData["Title"] = "Hồ sơ cá nhân";
+}
+
+<div class="profile-header" style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 0 0 50% 50%; margin-bottom: -100px;"></div>
+
+<div class="container pb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                <div class="card-body p-0">
+                    <div class="row g-0">
+
+                        <div class="col-md-4 bg-light text-center p-5 border-end d-flex flex-column justify-content-center align-items-center">
+                            <div class="position-relative d-inline-block mb-3">
+                                <img src="@(Model.Avatar ?? "https://via.placeholder.com/150")"
+                                     class="rounded-circle shadow-lg border border-4 border-white"
+                                     style="width: 140px; height: 140px; object-fit: cover;">
+                                <span class="position-absolute bottom-0 end-0 bg-success border border-white rounded-circle p-2"></span>
+                            </div>
+                            <h4 class="fw-bold text-dark mb-1">@Model.FullName</h4>
+                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary px-3 py-1 rounded-pill mb-4">
+                                @Model.StudentCode
+                            </span>
+
+                            <div class="d-grid gap-2 w-100">
+                                <a asp-action="EditProfile" class="btn btn-primary rounded-pill fw-bold"><i class="bi bi-pencil-square me-2"></i>Cập nhật hồ sơ</a>
+                                <a asp-action="MyGrades" class="btn btn-outline-primary rounded-pill fw-bold"><i class="bi bi-journal-text me-2"></i>Xem bảng điểm</a>
+                            </div>
+                        </div>
+
+                        <div class="col-md-8 p-5">
+                            <h5 class="fw-bold text-uppercase text-muted mb-4 small ls-1 border-bottom pb-2">
+                                <i class="bi bi-person-lines-fill me-2"></i>Thông tin cá nhân
+                            </h5>
+
+                            <div class="row g-4 mb-4">
+                                <div class="col-6">
+                                    <label class="fw-bold text-secondary small d-block">Lớp sinh hoạt</label>
+                                    <span class="fs-5 text-dark fw-bold">@Model.Class?.ClassName</span>
+                                </div>
+                                <div class="col-6">
+                                    <label class="fw-bold text-secondary small d-block">Ngày sinh</label>
+                                    <span class="fs-5 text-dark">@Model.DateOfBirth.ToString("dd/MM/yyyy")</span>
+                                </div>
+                                <div class="col-6">
+                                    <label class="fw-bold text-secondary small d-block">Số điện thoại</label>
+                                    <span class="text-dark"><i class="bi bi-telephone text-success me-1"></i> @(Model.PhoneNumber ?? "---")</span>
+                                </div>
+                                <div class="col-6">
+                                    <label class="fw-bold text-secondary small d-block">Địa chỉ</label>
+                                    <span class="text-dark"><i class="bi bi-geo-alt text-danger me-1"></i> @(Model.Address ?? "---")</span>
+                                </div>
+                            </div>
+
+                            <h5 class="fw-bold text-uppercase text-muted mb-4 small ls-1 border-bottom pb-2 mt-5">
+                                <i class="bi bi-house-heart-fill me-2"></i>Thông tin gia đình
+                            </h5>
+
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="p-3 bg-light rounded-3 h-100">
+                                        <label class="fw-bold text-secondary small d-block mb-1">Họ tên Phụ huynh</label>
+                                        <div class="fw-bold text-primary fs-5">
+                                            @(Model.ParentName ?? "Chưa cập nhật")
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="p-3 bg-light rounded-3 h-100">
+                                        <label class="fw-bold text-secondary small d-block mb-1">SĐT Phụ huynh</label>
+                                        <div class="fw-bold text-danger fs-5">
+                                            @if (!string.IsNullOrEmpty(Model.ParentPhone))
+                                            {
+                                                <a href="tel:@Model.ParentPhone" class="text-decoration-none text-danger">
+                                                    <i class="bi bi-telephone-fill me-2"></i>@Model.ParentPhone
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <span>---</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4 opacity-10">
+                            <div class="alert alert-light border d-flex align-items-center mb-0 shadow-sm">
+                                <i class="bi bi-info-circle-fill text-info fs-3 me-3"></i>
+                                <div class="small text-muted">
+                                    Nếu thông tin <strong>Lớp</strong> hoặc <strong>Mã SV</strong> bị sai, vui lòng liên hệ Phòng Đào tạo để được hỗ trợ điều chỉnh.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,61 @@
+﻿@model QuanLyLichHoc.Models.Class
+@{
+    ViewData["Title"] = "Cập nhật Lớp học";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-warning bg-opacity-75 text-dark text-center py-3 rounded-top-4">
+                    <h5 class="mb-0 fw-bold text-uppercase">Cập nhật Lớp Học</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Edit">
+                        <input type="hidden" asp-for="Id" />
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="ClassName" class="form-control" placeholder="Tên lớp" />
+                            <label asp-for="ClassName">Tên lớp</label>
+                            <span asp-validation-for="ClassName" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="AcademicYear" class="form-control" placeholder="Niên khóa" />
+                            <label asp-for="AcademicYear">Niên khóa</label>
+                            <span asp-validation-for="AcademicYear" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="MaxQuantity" class="form-control" type="number" />
+                            <label asp-for="MaxQuantity">Sĩ số tối đa</label>
+                            <span asp-validation-for="MaxQuantity" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-floating mb-4">
+                            <select asp-for="LecturerId" class="form-select" asp-items="ViewBag.LecturerId">
+                                <option value="">-- Chưa phân công --</option>
+                            </select>
+                            <label asp-for="LecturerId">Giảng viên chủ nhiệm</label>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-light rounded-pill">Hủy bỏ</a>
+                            <button type="submit" class="btn btn-warning px-4 fw-bold shadow-sm rounded-pill">
+                                <i class="bi bi-check-circle me-1"></i> Lưu thay đổi
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}

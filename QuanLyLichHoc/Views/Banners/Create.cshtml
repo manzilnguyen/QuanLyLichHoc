@@ -1,0 +1,95 @@
+﻿@model QuanLyLichHoc.Models.Banner
+@{
+    ViewData["Title"] = "Thêm Banner";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-primary text-white text-center py-3 rounded-top-4">
+                    <h5 class="mb-0 fw-bold">THÊM BANNER MỚI</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create" enctype="multipart/form-data">
+
+                        <div class="row">
+                            <div class="col-md-7">
+                                <div class="form-floating mb-3">
+                                    <input asp-for="Title" class="form-control" placeholder="Tiêu đề" required />
+                                    <label asp-for="Title">Tiêu đề Banner</label>
+                                    <span asp-validation-for="Title" class="text-danger small"></span>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    <input asp-for="LinkUrl" class="form-control" placeholder="Link" />
+                                    <label asp-for="LinkUrl">Đường dẫn khi click (URL)</label>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    <textarea asp-for="Description" class="form-control" style="height: 100px" placeholder="Mô tả"></textarea>
+                                    <label asp-for="Description">Mô tả ngắn</label>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="form-floating mb-3">
+                                            <input asp-for="Priority" class="form-control" type="number" value="1" />
+                                            <label asp-for="Priority">Thứ tự ưu tiên</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 d-flex align-items-center">
+                                        <div class="form-check form-switch fs-5">
+                                            <input class="form-check-input" type="checkbox" asp-for="IsActive" checked>
+                                            <label class="form-check-label fs-6">Hiển thị ngay</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-5">
+                                <div class="card bg-light border-0 h-100">
+                                    <div class="card-body text-center d-flex flex-column justify-content-center">
+                                        <label class="form-label fw-bold mb-3">Hình ảnh Banner</label>
+
+                                        <div class="mb-3 rounded-3 overflow-hidden bg-white shadow-sm d-flex align-items-center justify-content-center" style="height: 160px;">
+                                            <img id="imgPreview" src="https://via.placeholder.com/400x200?text=Preview"
+                                                 class="img-fluid" style="max-height: 100%; width: 100%; object-fit: cover;" />
+                                        </div>
+
+                                        <input type="file" name="imageFile" id="imageFile" class="form-control" accept="image/*" required onchange="previewImage(this)" />
+                                        <small class="text-muted mt-2">Định dạng: .jpg, .png, .jpeg</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4 border-top pt-3">
+                            <a asp-action="Index" class="btn btn-light rounded-pill px-4">Quay lại</a>
+                            <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm">
+                                <i class="bi bi-save me-1"></i> Lưu Banner
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('imgPreview').src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
