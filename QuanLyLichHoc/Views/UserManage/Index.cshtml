@@ -1,4 +1,4 @@
-﻿@model IEnumerable<QuanLyLichHoc.Models.AppUser>
+@model IEnumerable<QuanLyLichHoc.Models.AppUser>
 @{
     ViewData["Title"] = "Quản lý Tài khoản";
 }
@@ -9,19 +9,32 @@
     <div class="card shadow-sm border-0 rounded-3">
         <div class="card-header bg-white py-3">
             <div class="row align-items-center">
+
                 <div class="col-lg-3">
                     <h4 class="mb-0 text-primary fw-bold"><i class="bi bi-shield-lock-fill me-2"></i>Tài khoản</h4>
                 </div>
 
-                <div class="col-lg-4">
+                <div class="col-lg-5">
                     <form asp-action="Index" method="get" class="d-flex gap-2">
-                        <div class="input-group">
+                        <div class="input-group" style="min-width: 200px;">
                             <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
                             <input type="text" name="searchString" class="form-control border-start-0 bg-light"
                                    placeholder="Username hoặc Tên..." value="@ViewData["CurrentFilter"]">
                         </div>
-                        <select name="roleFilter" class="form-select w-50" onchange="this.form.submit()">
-                            <option value="">-- Tất cả --</option>
+
+                        <select name="classId" class="form-select" style="max-width: 150px;" onchange="this.form.submit()">
+                            <option value="">-- Lớp --</option>
+                            @if (ViewData["ClassList"] != null)
+                            {
+                                @foreach (var item in (SelectList)ViewData["ClassList"])
+                                {
+                                    <option value="@item.Value" selected="@item.Selected">@item.Text</option>
+                                }
+                            }
+                        </select>
+
+                        <select name="roleFilter" class="form-select" style="max-width: 150px;" onchange="this.form.submit()">
+                            <option value="">-- Vai trò --</option>
                             <!option value="Admin" selected="@((string)ViewData["CurrentRole"] == "Admin")">Admin</!option>
                             <!option value="Lecturer" selected="@((string)ViewData["CurrentRole"] == "Lecturer")">Giảng viên</!option>
                             <!option value="Student" selected="@((string)ViewData["CurrentRole"] == "Student")">Học sinh</!option>
@@ -30,8 +43,9 @@
                     </form>
                 </div>
 
-                <div class="col-lg-5 text-lg-end">
+                <div class="col-lg-4 text-lg-end">
                     <div class="btn-group shadow-sm">
+
                         <form asp-action="AutoGenerateAccounts" method="post" class="d-inline">
                             <button type="submit" class="btn btn-warning fw-bold text-dark"
                                     onclick="return confirm('Hệ thống sẽ tạo tài khoản cho tất cả GV (Email) và HS (Mã SV) chưa có. Mật khẩu: 123. Tiếp tục?')">
@@ -75,9 +89,7 @@
                         {
                             <tr>
                                 <td class="ps-4 fw-bold text-primary">@item.Username</td>
-
                                 <td class="text-muted font-monospace">******</td>
-
                                 <td>
                                     @if (item.Role == "Admin")
                                     {
@@ -90,6 +102,10 @@
                                     else if (item.Role == "Student")
                                     {
                                         <span class="badge bg-info rounded-pill">Học sinh</span>
+                                        @if (item.Student?.Class != null)
+                                        {
+                                            <span class="badge bg-secondary ms-1">@item.Student.Class.ClassName</span>
+                                        }
                                     }
                                     else if (item.Role == "Parent")
                                     {
@@ -154,7 +170,6 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // SỬ DỤNG HTML.RAW ĐỂ TRÁNH LỖI FONT TIẾNG VIỆT
         var successMsg = '@Html.Raw(TempData["Success"])';
         var infoMsg = '@Html.Raw(TempData["Info"])';
         var errorMsg = '@Html.Raw(TempData["Error"])';
